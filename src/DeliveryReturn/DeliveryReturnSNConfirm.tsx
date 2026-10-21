@@ -93,6 +93,8 @@ export default function DeliveryReturnSNConfirm({ navigation, route }: any) {
         fetchData();
     }, [token, palletCode, deliveryCode, currentSn]);
 
+     console.log("details",  snData[0]?.sn );
+
     const handleConfirm = () => {
         Alert.alert(
             "Confirm Return",
@@ -102,7 +104,12 @@ export default function DeliveryReturnSNConfirm({ navigation, route }: any) {
                 {
                     text: "Yes",
                     onPress: () => {
-                        DeviceEventEmitter.emit('ON_DELIVERY_RETURN_CONFIRM', { palletCode, sType, currentSn });
+                        DeviceEventEmitter.emit('ON_DELIVERY_RETURN_CONFIRM',
+                            {
+                                palletCode,
+                                sType:'sn',
+                                currentSn:snData[0]?.sn 
+                            });
                         navigation.goBack();
                     }
                 }

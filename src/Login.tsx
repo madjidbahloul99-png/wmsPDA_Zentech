@@ -5,10 +5,13 @@ import React, {
     useImperativeHandle,
     useEffect,
 } from "react";
+import { Keyboard, AppState, NativeModules } from "react-native";
+
 import md5 from "md5";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
+import RNFS from 'react-native-fs';
 import {
     View,
     Text,
@@ -38,7 +41,6 @@ import lockIcon from "../assets/logo/lock.png";
 import warehouseIcon from "../assets/logo/warehouse.png";
 import settingsIcon from "../assets/logo/settings.png";
 import condorLogo from "../assets/logo/condor_logo.png";
-import { User } from "lucide-react-native";
 
 
 /* =====================
@@ -69,6 +71,7 @@ const CustomInput = forwardRef<CustomInputRef, any>(
             placeholder,
             isSelect = false,
             isPassword = false,
+            hideText = false,
             onChangeText,
             options = [],
             inputRef,
@@ -117,8 +120,8 @@ const CustomInput = forwardRef<CustomInputRef, any>(
                             value={value}
                             onChangeText={onChangeText}
                             placeholder={placeholder}
-                            placeholderTextColor="#94a3b8"
-                            style={styles.input}
+                            placeholderTextColor={hideText ? "transparent" : "#94a3b8"}
+                            style={[styles.input, hideText && { opacity: 0 }]}
                             secureTextEntry={isPassword && !showPassword}
                             onFocus={() => setIsFocused(true)}
                             onBlur={(e) => {
@@ -206,7 +209,13 @@ export default function Login({ navigation }: any) {
     const [originalQRUser, setOriginalQRUser] = useState("");
     const [originalQRPassword, setOriginalQRPassword] = useState("");
     const [displayUserCode, setDisplayUserCode] = useState("");
+    const [hideUserCode, setHideUserCode] = useState(false);
+    const [updateStatus, setUpdateStatus] = useState<"" | "downloading" | "installing">("");
+    const [downloadProgress, setDownloadProgress] = useState(0);
+    const [downloadedBytes, setDownloadedBytes] = useState(0);
+    const [totalBytes, setTotalBytes] = useState(0);
     const scanTimer = useRef<any>(null);
+    const isScanningRef = useRef(false);
 
     const [classOptions, setClassOptions] = useState<ClassItem[]>(
         []
@@ -222,13 +231,86 @@ export default function Login({ navigation }: any) {
 
     const passwordsMatch = (input: string, server: string): boolean => {
         const normalize = (str: string) =>
-            str.replace(/\\/g, "")  
-                .replace(/[\r\n]/g, "") 
+            str.replace(/\\/g, "")
+                .replace(/[\r\n]/g, "")
                 .trim();
 
         return normalize(input) === normalize(server);
     };
 
+    const downloadAndInstall = (apkUrl: string) => {
+        setUpdateStatus("downloading");
+        setDownloadProgress(0);
+        setDownloadedBytes(0);
+        setTotalBytes(0);
+
+        // Sauvegarder dans le dossier public "Téléchargements" (Downloads) d'Android
+        const destPath = `${Platform.OS === 'android' ? RNFS.DownloadDirectoryPath : RNFS.DocumentDirectoryPath}/WMS_Update_${Date.now()}.apk`;
+
+        const downloadOptions = {
+            fromUrl: apkUrl,
+            toFile: destPath,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Android; Mobile) WMS-App',
+                'Accept': 'application/vnd.android.package-archive, application/octet-stream, */*'
+            },
+            progressInterval: 500,
+            progress: (res: any) => {
+                const totalNum = Number(res.contentLength);
+                const receivedNum = Number(res.bytesWritten);
+                setDownloadedBytes(receivedNum);
+                setTotalBytes(totalNum);
+                if (totalNum > 0) {
+                    const percentage = Math.floor((receivedNum / totalNum) * 100);
+                    setDownloadProgress(percentage);
+                }
+            },
+            connectionTimeout: 120000,
+            readTimeout: 120000,
+        };
+
+        const ret = RNFS.downloadFile(downloadOptions);
+
+        ret.promise.then((res) => {
+            if (res.statusCode === 200) {
+                setUpdateStatus("");
+                setDownloadProgress(0);
+                setDownloadedBytes(0);
+                setTotalBytes(0);
+
+                // 👉 Lancement automatique de l'installation via le module natif
+                if (Platform.OS === "android" && NativeModules.ApkInstaller) {
+                    NativeModules.ApkInstaller.installApk(destPath)
+                        .then(() => {
+                            console.log("Installation lancée automatiquement");
+                        })
+                        .catch((err: any) => {
+                            console.log("Install error:", err);
+                            Alert.alert(
+                                "Installation manuelle requise",
+                                "Le fichier a été sauvegardé dans 'Téléchargements'. Veuillez l'ouvrir manuellement pour installer."
+                            );
+                        });
+                } else {
+                    Alert.alert(
+                        "Téléchargement terminé",
+                        "Le fichier de mise à jour a été sauvegardé dans le dossier 'Téléchargements' (Downloads) de votre téléphone.\n\nVeuillez ouvrir votre gestionnaire de fichiers pour l'installer manuellement."
+                    );
+                }
+            } else {
+                throw new Error(`Server returned status: ${res.statusCode}`);
+            }
+        })
+            .catch((err) => {
+                console.log("Download error:", err);
+                setUpdateStatus("");
+                Alert.alert(
+                    "Réseau instable",
+                    "Le téléchargement a été interrompu. Nous ouvrons le navigateur pour finaliser la mise à jour..."
+                );
+                Linking.openURL(apkUrl);
+            });
+    };
     const checkUpdate = async (url?: string) => {
         const finalURL = url || gsURL;
 
@@ -245,7 +327,7 @@ export default function Login({ navigation }: any) {
 
             const serverVersion = json.data.version;
             const apkUrl = json.data.url;
-            const required = json.data.required;
+            const required = json.data.forceUpdate;
 
             const currentVersion = operateVersion;
 
@@ -257,7 +339,7 @@ export default function Login({ navigation }: any) {
                         [
                             {
                                 text: "Installer",
-                                onPress: () => Linking.openURL(apkUrl)
+                                onPress: () => downloadAndInstall(apkUrl)
                             }
                         ],
                         { cancelable: false }
@@ -270,7 +352,7 @@ export default function Login({ navigation }: any) {
                             { text: "Plus tard", style: "cancel" },
                             {
                                 text: "Installer",
-                                onPress: () => Linking.openURL(apkUrl)
+                                onPress: () => downloadAndInstall(apkUrl)
                             }
                         ]
                     );
@@ -286,6 +368,22 @@ export default function Login({ navigation }: any) {
         checkUpdate(gsURL);
     }, []);
 
+    const appState = useRef(AppState.currentState);
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", (nextState) => {
+            if (
+                appState.current.match(/inactive|background/) &&
+                nextState === "active"
+            ) {
+                Keyboard.dismiss();
+            }
+
+            appState.current = nextState;
+        });
+
+        return () => subscription.remove();
+    }, []);
+
 
     useEffect(() => {
         console.log("OPERATE INFO UPDATED:", {
@@ -298,50 +396,45 @@ export default function Login({ navigation }: any) {
 
     const handleUserCodeChange = (text: string) => {
         const now = Date.now();
+        const diff = now - lastKeyTime.current;
         lastKeyTime.current = now;
 
         clearTimeout(scanTimer.current);
-
-
 
         if (text.endsWith("\n") || text.endsWith("\r")) {
             const cleanCode = text.trim();
             if (cleanCode.length > 0) {
                 setUserCode(cleanCode);
-                checkUserCode(cleanCode);
+                checkUserCode(cleanCode, isScanningRef.current);
             }
-
+            isScanningRef.current = false;
             return;
         }
 
+        if (text.includes("|") || (diff < 50 && text.length > 1)) {
+            isScanningRef.current = true;
+        } else if (text.length <= 1) {
+            isScanningRef.current = false;
+        }
+
+        setHideUserCode(isScanningRef.current);
         setUserCode(text);
+        setDisplayUserCode(text);
 
-
-        if (text.includes("|")) {
-
-            setDisplayUserCode(" ".repeat(text.length));
+        if (isScanningRef.current) {
             scanTimer.current = setTimeout(() => {
                 const finalCode = text.trim();
-                //console.log("Reinforced Scan Buffer Stabilized:", finalCode);
-
-              
                 const parts = finalCode.split("|");
                 if (parts.length >= 2) {
-                    setDisplayUserCode(parts[0].trim()); 
+                    setDisplayUserCode(parts[0].trim());
                 }
-                checkUserCode(finalCode);
-            }, 800);
+                checkUserCode(finalCode, true);
+            }, 1200);
         } else {
-
             scanTimer.current = setTimeout(() => {
                 const finalCode = text.trim();
-
-                Alert.alert("Error", "QR invalide ");
-                setUserCode("")
-                return;
-            }, 400);
-
-
+                checkUserCode(finalCode, false);
+            }, 1200);
         }
     };
 
@@ -388,7 +481,7 @@ export default function Login({ navigation }: any) {
 
 
 
-    const handleSelectWarehouse = (item: any) => {
+    const handleSelectWarehouse = (item:any) => {
         setSelectedWarehouse(item);
         setOperateWareHouseCode(item.wareHouseCode);
 
@@ -447,14 +540,14 @@ export default function Login({ navigation }: any) {
     /* =====================
        Check User
     ===================== */
-    const checkUserCode = async (manualInput?: string) => {
+    const checkUserCode = async (manualInput?: string, isScanner?: boolean) => {
         const inputToProcess = typeof manualInput === "string" ? manualInput : userCode;
         if (!inputToProcess) {
             Alert.alert("Error", "UserCode required");
             return;
         }
 
-       // console.log("Raw Input to checkUserCode:", `[${inputToProcess}]`);
+        // console.log("Raw Input to checkUserCode:", `[${inputToProcess}]`);
 
 
         const normalizeQR = (str: string) => {
@@ -473,24 +566,40 @@ export default function Login({ navigation }: any) {
         if (inputToProcess.includes("|")) {
             const cleanInput = normalizeQR(inputToProcess);
 
-           // console.log("SCAN RAW:", `[${inputToProcess}]`);
-            //console.log("SCAN CLEAN:", `[${cleanInput}]`);
-
             const parts = cleanInput.split("|");
             if (parts.length >= 2) {
                 const u = parts[0].trim();
-
                 const p = parts.slice(1).join("|").trim();
 
+                userRef.current?.setNativeProps({ text: u });
                 setUserCode(u);
-                setPassword(p);
+                setDisplayUserCode(u);
 
-                //console.log("Parsed QR -> User:", `[${u}]`, "Pass:", `[${p}]`);
+                passwordRef.current?.setNativeProps({ text: p });
+                setPassword(p);
+                setHideUserCode(false);
+
                 processQRScan(u, p);
                 return;
             }
+        } else {
+            if (isScanner) {
+                userRef.current?.setNativeProps({ text: "" });
+                setHideUserCode(false);
+                setUserCode("");
+                setDisplayUserCode("");
+                setPassword("");
+                Alert.alert("Error", "QR invalide");
+                return;
+            } else {
+                userRef.current?.setNativeProps({ text: cleanForCompare(inputToProcess) });
+                setUserCode(cleanForCompare(inputToProcess));
+                setDisplayUserCode(cleanForCompare(inputToProcess));
+                setHideUserCode(false);
+            }
         }
 
+        setHideUserCode(false);
         try {
             const res = await fetch(`${gsURL}/api/UserInfo/getuserinfo`, {
                 method: "POST",
@@ -617,16 +726,21 @@ export default function Login({ navigation }: any) {
                 Alert.alert("Error", wareData.Message);
                 return;
             }
-            setWarehouseOptions(
-                wareData.data.map((w: any) => ({
-                    wareHouseCode: w.wareHouseCode,
-                    wareHouseName: w.wareHouseName.trim(),
-                }))
-            );
+            console.log("list warehouse",wareData)
+            const mappedWarehouses = wareData.data.map((w: any) => ({
+                wareHouseCode: w.wareHouseCode,
+                wareHouseName: w.wareHouseCode,
+            }));
+            setWarehouseOptions(mappedWarehouses);
+               console.log(" mappedWarehouses", wareData.data.dawareHouseCode)
+            if (mappedWarehouses.length > 0) {
+                setSelectedWarehouse(mappedWarehouses[0]);
+                setOperateWareHouseCode(mappedWarehouses[0].wareHouseCode);
+            }
 
             setActiveField("warehouse");
             setTimeout(() => warehouseRef.current?.focus(), 100);
-            Alert.alert("Success", "QR Login: Please select warehouse");
+            // Alert.alert("Success", "QR Login: Please select warehouse");
 
         } catch (error) {
             Alert.alert("Error", "QR processing failed");
@@ -661,12 +775,15 @@ export default function Login({ navigation }: any) {
 
             const data = await res.json();
             console.log("donnes de wh", data);
-            setWarehouseOptions(
-                data.data.map((w: any) => ({
-                    wareHouseCode: w.wareHouseCode,
-                    wareHouseName: w.wareHouseName.trim(),
-                }))
-            );
+            const mappedWarehouses = data.data.map((w: any) => ({
+                wareHouseCode: w.wareHouseCode,
+                wareHouseName: w.wareHouseCode,
+            }));
+            setWarehouseOptions(mappedWarehouses);
+            if (mappedWarehouses.length > 0) {
+                setSelectedWarehouse(mappedWarehouses[0]);
+                setOperateWareHouseCode(mappedWarehouses[0].wareHouseCode);
+            }
 
             setActiveField("warehouse");
             setTimeout(() => warehouseRef.current?.focus(), 100);
@@ -859,7 +976,7 @@ export default function Login({ navigation }: any) {
                         }
                     }
                 } catch (checkErr) {
-                    console.error("Error verifying classes time:", checkErr);
+                    Alert.alert("Error", "Error verifying classes time");
                 }
 
                 setgs_classCode(ClassCode);
@@ -892,7 +1009,6 @@ export default function Login({ navigation }: any) {
                 console.log("Workdate set:", gs_workdate);
 
             } catch (error) {
-                console.error("Fetch workdate error:", error);
                 Alert.alert("Error", "Something went wrong while fetching workdate!");
             }
 
@@ -945,17 +1061,15 @@ export default function Login({ navigation }: any) {
 
 
                 navigation.navigate("Menu");
-                
+
 
             } catch (error) {
-                console.error("JWT generation error:", error);
                 Alert.alert("Error", "Something went wrong while generating JWT!");
             }
 
 
 
         } catch (err) {
-            console.error(err);
             Alert.alert("Error", "Cannot reach server or something went wrong!");
         }
     };
@@ -970,12 +1084,44 @@ export default function Login({ navigation }: any) {
                 <View style={styles.container}>
                     {/* 1. Logo Condor Logistics */}
                     <View style={styles.logoContainer}>
-                        <Image
-                            source={condorLogo}
-                            style={styles.condorLogo}
-                            resizeMode="stretch"
-                        />
+
+                        <TouchableOpacity
+
+                            style={{ width: "100%" }}
+                            activeOpacity={0.8}
+                            onPress={() => {
+                                setShowSettings(false);
+                                setgs_roleCode("");
+
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: "Login" }],
+                                });
+
+                            }}
+                        >
+                            <Image
+                                source={condorLogo}
+                                style={styles.condorLogo}
+                                resizeMode="stretch"
+                            />
+
+                        </TouchableOpacity>
                         <Text style={styles.wmsText}>WAREHOUSE MANAGEMENT SYSTEM</Text>
+                    </View>
+                    {/* 3. Version and Settings below Warehouse */}
+                    <View style={styles.infoBox}>
+                        <View style={styles.infoRow}>
+                            <Text style={styles.version}>App Version  {operateVersion}</Text>
+                            {gs_roleCode === "RoleAdmin" && (
+                                <TouchableOpacity onPress={() => setShowSettings(true)}>
+                                    <Image
+                                        source={settingsIcon}
+                                        style={styles.settingsIcon}
+                                    />
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     </View>
 
 
@@ -1015,7 +1161,7 @@ export default function Login({ navigation }: any) {
                                         }
                                     }
                                 } catch (checkErr) {
-                                    console.error("Error verifying classes time on select:", checkErr);
+                                    Alert.alert("Error", "Error verifying classes time on select");
                                 }
 
                                 setSelectedClass(val);
@@ -1031,7 +1177,8 @@ export default function Login({ navigation }: any) {
                         <CustomInput
                             label="User Code"
                             placeholder="Enter your ID"
-                            value={displayUserCode}  
+                            value={displayUserCode}
+                            hideText={hideUserCode}
                             onChangeText={handleUserCodeChange}
                             inputRef={userRef}
                             //onSubmitEditing={() => checkUserCode()}
@@ -1070,24 +1217,11 @@ export default function Login({ navigation }: any) {
                         />
                     </View>
 
-                    {/* 3. Version and Settings below Warehouse */}
-                    <View style={styles.infoBox}>
-                        <View style={styles.infoRow}>
-                            <Text style={styles.version}>App Version  {operateVersion}</Text>
-                            {gs_roleCode === "RoleAdmin" && (
-                                <TouchableOpacity onPress={() => setShowSettings(true)}>
-                                    <Image
-                                        source={settingsIcon}
-                                        style={styles.settingsIcon}
-                                    />
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                    </View>
+
 
                     <View style={styles.buttonContainer}>
                         <LinearGradient
-                            colors={['#85ddf3ff', '#0052cc']}
+                            colors={['#f391f7ff', '#0052cc']}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
                             style={styles.gradientButton}
@@ -1134,6 +1268,44 @@ export default function Login({ navigation }: any) {
                                     <Text style={{ color: '#fff' }}>Save</Text>
                                 </TouchableOpacity>
                             </View>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Update Progress Modal (Alert style) */}
+                <Modal transparent visible={updateStatus !== ""} animationType="fade">
+                    <View style={styles.modalOverlay}>
+                        <View style={[styles.modalContent, { alignItems: 'center', paddingVertical: 30 }]}>
+                            <ActivityIndicator size="large" color="#0052cc" style={{ marginBottom: 15 }} />
+                            <Text style={styles.modalTitle}>
+                                {updateStatus === "downloading" ? "Téléchargement en cours" : "Lancement de l'installation..."}
+                            </Text>
+                            {updateStatus === "downloading" && (
+                                <>
+                                    {totalBytes > 0 ? (
+                                        <>
+                                            <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#0052cc', marginTop: 10 }}>
+                                                {downloadProgress}%
+                                            </Text>
+                                            <Text style={{ fontSize: 12, color: '#64748b', marginTop: 5 }}>
+                                                {(downloadedBytes / 1024 / 1024).toFixed(2)} MB / {(totalBytes / 1024 / 1024).toFixed(2)} MB
+                                            </Text>
+                                            <View style={{ width: '100%', height: 10, backgroundColor: '#e2e8f0', borderRadius: 5, marginTop: 15, overflow: 'hidden' }}>
+                                                <View style={{ width: `${downloadProgress}%`, height: '100%', backgroundColor: '#0052cc' }} />
+                                            </View>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#0052cc', marginTop: 10 }}>
+                                                {(downloadedBytes / 1024 / 1024).toFixed(2)} MB téléchargés
+                                            </Text>
+                                            <Text style={{ fontSize: 12, color: '#64748b', marginTop: 5 }}>
+                                                Calcul de la taille totale...
+                                            </Text>
+                                        </>
+                                    )}
+                                </>
+                            )}
                         </View>
                     </View>
                 </Modal>
@@ -1225,7 +1397,7 @@ const styles = StyleSheet.create({
     },
 
     form: {
-        marginBottom: height * 0.015,
+        marginBottom: height * 0.00005,
     },
 
     inputWrapper: {
@@ -1249,7 +1421,7 @@ const styles = StyleSheet.create({
     },
 
     inputFocused: {
-        borderColor: "#0052cc",
+        borderColor: "#c744e7ff",
     },
 
     inputIcon: {
@@ -1303,15 +1475,6 @@ const styles = StyleSheet.create({
         fontSize: isSmallDevice ? scale(16) : scale(18),
     },
 
-    secondaryButton: {
-        borderWidth: 2,
-        borderColor: "#e2e8f0",
-    },
-
-    secondaryButtonText: {
-        fontWeight: "700",
-        fontSize: isSmallDevice ? scale(13) : scale(15),
-    },
 
     gradientButton: {
         borderRadius: 10,
@@ -1356,7 +1519,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#f8fafc",
         padding: width * 0.02,
         borderRadius: 10,
-        marginBottom: height * 0.001,
+        marginBottom: height * 0.02,
         borderWidth: 1,
         borderColor: "#e2e8f0",
     },

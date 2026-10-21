@@ -247,7 +247,7 @@ export default function PD({ navigation }: any) {
             }
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                Alert.alert("HTTP error! status:", '${response.status}');
             }
 
             const result = await response.json();
@@ -413,9 +413,9 @@ export default function PD({ navigation }: any) {
                 navigation.goBack();
                 return;
             }
-             console.log("typeResult", typeResult);
+            console.log("typeResult", typeResult);
             let scanType = "";
-            if (typeResult.message === "success" && typeResult.data ) {
+            if (typeResult.message === "success" && typeResult.data) {
                 scanType = typeResult.data.scanType;
             }
             console.log("scanType", scanType);
@@ -451,7 +451,7 @@ export default function PD({ navigation }: any) {
                     const resultData = scanResult.data;
 
                     if (resultData.isok === "0") {
-                        
+
                         Alert.alert("Error", resultData.retstr || "Scan failed");
                     } else {
                         Alert.alert("Success", "scan successfully.");
@@ -574,12 +574,7 @@ export default function PD({ navigation }: any) {
                 </View>
             </View>
 
-            <View style={styles.statsCard}>
-                <View style={[styles.statBox, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
-                    <Text style={styles.statLabel}>Total</Text>
-                    <Text style={styles.statValue}>{totalQty}</Text>
-                </View>
-            </View>
+
 
             <View style={styles.content}>
                 <View style={styles.formCard}>
@@ -665,6 +660,13 @@ export default function PD({ navigation }: any) {
                     </ScrollView>
                 </View>
 
+                <View style={styles.statsCard}>
+                    <View style={[styles.statBox, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+                        <Text style={styles.statLabel}>Total</Text>
+                        <Text style={styles.statValue}>{totalQty}</Text>
+                    </View>
+                </View>
+
                 <View style={styles.footer}>
                     <View style={styles.buttonRow}>
                         {showConfirmBtn && (
@@ -713,7 +715,8 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 12,
         marginHorizontal: 8,
-        marginBottom: 2,
+        marginBottom: 8,
+        marginTop: 4,
         elevation: 2,
         borderWidth: 1,
         borderColor: "#E2E8F0"
@@ -735,7 +738,7 @@ const styles = StyleSheet.create({
     cell: { fontSize: 11, color: "#334155", textAlign: "center", fontWeight: "600" },
     cellMain: { fontSize: 11, color: "#1E293B", fontWeight: "700", textAlign: "center" },
     cellSub: { fontSize: 10, color: "#64748B", textAlign: "center" },
-    footer: { paddingHorizontal: 16, paddingVertical: 8, borderTopWidth: 1, borderTopColor: '#e2e8f0' },
+    footer: { paddingHorizontal: 16, paddingVertical: 8 },
     buttonRow: { flexDirection: 'row', gap: 12 },
     actionBtn: { flex: 1, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
     btnPrimary: { backgroundColor: '#10B981' },

@@ -11,13 +11,14 @@ import {
     Image,
     Dimensions,
     Alert,
+    ActivityIndicator,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useGlobal } from "../../GlobalContext.tsx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface AllocateInItem {
-    systemAllocateCode: string;   
+    systemAllocateCode: string;
     model: string;
     color: string;
     qty: number;
@@ -31,7 +32,8 @@ interface AllocateInItem {
 
 export default function AllocateInNO({ navigation }: any) {
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion } = global;
+    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName, operateUserCode, operateUserName,
+    gs_userCode, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion } = global;
     const BASE_URL = gsURL;
     const [token, setToken] = useState("");
 
@@ -69,6 +71,40 @@ export default function AllocateInNO({ navigation }: any) {
     const fetchAllocateInModelList = async (systemAllocateCode: string) => {
         setErrorMsg("");
         setLoading(true);
+
+
+        try {
+            // 1. Get SAP Bill
+            const sapResponse = await fetch(`${BASE_URL}/api/SAPBill/GetSAPBill`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, },
+                body: JSON.stringify({
+                    operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
+                    MAIN_BILL_CODE: systemAllocateCode,
+                    UserCode: gs_userCode,
+                    UserName: gs_userName,
+                }),
+            });
+
+            if (sapResponse.status === 401) {
+                Alert.alert("Unauthorized", "Token expired or invalid.");
+                return;
+            }
+
+            if (sapResponse.status === 403) {
+                Alert.alert("Access Denied", "You do not have permission.");
+                return;
+            }
+            const sapResult = await sapResponse.json();
+            console.log("sapResult / ", sapResult);
+            if (sapResult && sapResult.message) {
+                setErrorMsg("SAP msg:" + sapResult.message);
+            }
+        } catch (err: any) {
+            setErrorMsg("SAP Error: " + err.message);
+        }
+
+
         try {
             const response = await fetch(`${BASE_URL}/api/AllocateInModel`, {
                 method: "POST",
@@ -81,7 +117,7 @@ export default function AllocateInNO({ navigation }: any) {
             });
 
             if (response.status === 401) {
-                Alert.alert("Unauthorized", "Token expired or invalid."); 
+                Alert.alert("Unauthorized", "Token expired or invalid.");
                 return;
             }
 
@@ -99,7 +135,7 @@ export default function AllocateInNO({ navigation }: any) {
             }
             const newItems: AllocateInItem[] = [];
             let tock = "";
-             console.log("result  AllocateIN", result);
+            console.log("result  AllocateIN", result);
 
             if (result && result.message === 'success' && result.data) {
                 result.data.forEach((row: any) => {
@@ -248,6 +284,11 @@ export default function AllocateInNO({ navigation }: any) {
             </View>
 
             <View style={styles.content}>
+                {loading && (
+                    <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.4)', zIndex: 10 }]}>
+                        <ActivityIndicator size="large" color="#0052cc" />
+                    </View>
+                )}
 
                 {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
 

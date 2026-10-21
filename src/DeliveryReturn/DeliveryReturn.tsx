@@ -10,6 +10,7 @@ import {
     StatusBar,
     Alert,
     ScrollView,
+    FlatList,
     Image,
     Dimensions,
     DeviceEventEmitter,
@@ -22,6 +23,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 interface BoxItem {
     id: string;
     boxCode: string;
+    palletCode: string;
+    SN: string;
     model: string;
     color: string;
     boxQty: string;
@@ -30,7 +33,8 @@ interface BoxItem {
 const AnimatedView = Animated.View as any;
 
 export default function DeliveryReturn({ navigation, route }: any) {
-    const { deliveryCode, systemDeliveryCode, tock } = route.params;
+
+    const { deliveryCode, systemDeliveryCode, tock,totalQty } = route.params;
     const global = useGlobal();
     const { gsURL, gs_factoryCode, gs_wareCode, gs_classCode, gs_groupCode, gs_workdate, gs_userCode, gs_userName,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
@@ -105,6 +109,125 @@ export default function DeliveryReturn({ navigation, route }: any) {
     }, []);
 
     useEffect(() => {
+        if (!token || !systemDeliveryCode) return;
+
+        const getDeliveryReturnDetail = async () => {
+            setLoading(true);
+
+            try {
+                const response = await fetch(
+                    `${BASE_URL}/api/DeliveryReturnDetail`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            operateUserCode,
+                            operateUserName,
+                            operateWareHouseCode,
+                            operateRandomNumber,
+                            operateSign,
+                            operateVersion,
+
+                            factoryCode: gs_factoryCode,
+                            wareHouseCode: gs_wareCode,
+                            deliveryCode: deliveryCode,
+                        }),
+                    }
+                );
+
+                if (response.status === 401) {
+                    Alert.alert(
+                        "Unauthorized",
+                        "Token expired or invalid."
+                    );
+                    return;
+                }
+
+                if (response.status === 403) {
+                    Alert.alert(
+                        "Access Denied",
+                        "You do not have permission."
+                    );
+                    return;
+                }
+
+                const result = await response.json();
+
+                console.log("DeliveryReturnDetail:", result);
+
+                if (result.message == "success" && result.data) {
+
+                    const data = result.data;
+
+                    const mapped = data.map(
+                        (item: any, index: number) => ({
+                            id: index.toString(),
+                            boxCode: item.boxCode || "",
+                            palletCode: item.palletCode || item.scanBarcodeLarge || "",
+                            SN: item.sn,
+                            model: item.model || "",
+                            color: item.color || "",
+                            boxQty: String(item.boxQty || "0"),
+                        })
+                    );
+
+                    setBoxList(mapped);
+
+                    // totalQty est identique sur toutes les lignes
+                    if (data.length > 0) {
+                        setQty(String(data[0].totalQty || "0"));
+                    } else {
+                        setQty("0");
+                    }
+
+                } else {
+                    setBoxList([]);
+                    setQty("0");
+
+                    Alert.alert(
+                        "Error",
+                        result.message || "No return data found."
+                    );
+                }
+
+            } catch (err: any) {
+                Alert.alert(
+                    "DeliveryReturnDetail error:",
+                    err
+                );
+
+                setBoxList([]);
+                setQty("0");
+
+                Alert.alert(
+                    "Error",
+                    "Data handling exceptions, please check!"
+                );
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getDeliveryReturnDetail();
+
+    }, [
+        token,
+        systemDeliveryCode,
+        BASE_URL,
+        gs_factoryCode,
+        gs_wareCode,
+        operateUserCode,
+        operateUserName,
+        operateWareHouseCode,
+        operateRandomNumber,
+        operateSign,
+        operateVersion,
+    ]);
+
+    useEffect(() => {
         if (!token || !deliveryCode) return;
 
         const deliveryDeal = async () => {
@@ -140,9 +263,11 @@ export default function DeliveryReturn({ navigation, route }: any) {
                 console.log("deliverCHECK", result)
                 if (result.message === "success" && result.data) {
                     const data = result.data;
-                    if (data.isOk !== "1") {
-                        Alert.alert("Error", data.retstr || "Delivery Check Error");
-                        navigation.goBack();
+                    if (data.isOk == "1") {
+                        //ok
+                    } else {
+                        // Alert.alert("Error", data.retStr);
+                        //navigation.goBack();
                     }
                 } else {
                     Alert.alert("Error", "Data handling exceptions, please check!");
@@ -208,7 +333,7 @@ export default function DeliveryReturn({ navigation, route }: any) {
                 navigation.goBack();
                 return;
             }
-            console.log("deliverytypescan", typeResult)
+            console.log("deliverytypescannow", typeResult)
             if (typeResult.message === "success" && typeResult.data) {
                 let scanType = (typeResult.data.scanType || "").toLowerCase();
                 if (scanType === "") { scanType = "pallet" }
@@ -223,7 +348,7 @@ export default function DeliveryReturn({ navigation, route }: any) {
                         systemDeliveryCode,
                         tock
                     });
-                } else if (scanType === "sn") {
+                } else if (scanType === "sn" ||  scanType === "imei") {
                     setScanState("success");
                     navigation.navigate("DeliveryReturnSNConfirm", {
                         palletCode: "",
@@ -303,6 +428,7 @@ export default function DeliveryReturn({ navigation, route }: any) {
                     const mapped = result.data.map((item: any, index: number) => ({
                         id: index.toString(),
                         boxCode: item.boxCode || item.scanBarcodeLarge,
+                        palletCode: item.palletCode || item.scanBarcodeLarge || pCode,
                         model: item.model,
                         color: item.color,
                         boxQty: item.boxQty,
@@ -388,10 +514,14 @@ export default function DeliveryReturn({ navigation, route }: any) {
                 { backgroundColor: index % 2 === 0 ? "#FFFFFF" : "#BAE6FD" },
                 selectedItemIndex === index && styles.selectedRow
             ]}
-            onPress={() => setSelectedItemIndex(index)}
+            onPress={() => {
+                setSelectedItemIndex(index);
+            }}
             activeOpacity={0.7}
         >
             <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
+            <Text style={[styles.cell, { width: 150 }]}>{item.palletCode}</Text>
+            <Text style={[styles.cell, { width: 150 }]}>{item.SN}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
             <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
             <Text style={[styles.cell, { width: 60 }]}>{item.boxQty}</Text>
@@ -458,25 +588,25 @@ export default function DeliveryReturn({ navigation, route }: any) {
                         <View>
                             <View style={styles.tableHeader}>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
+                                <Text style={[styles.headerCell, { width: 150 }]}>Pallet Code</Text>
+                                <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
                                 <Text style={[styles.headerCell, { width: 120 }]}>Model</Text>
                                 <Text style={[styles.headerCell, { width: 100 }]}>Color</Text>
                                 <Text style={[styles.headerCell, { width: 60 }]}>Qty</Text>
                             </View>
-                            <ScrollView style={{ flex: 1 }}>
-                                {boxList.length === 0 ? (
+                            <FlatList
+                                data={boxList}
+                                keyExtractor={(item, index) => item.id || index.toString()}
+                                renderItem={renderItem}
+                                style={{ flex: 1 }}
+                                ListEmptyComponent={() => (
                                     loading ? (
                                         <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
                                     ) : (
                                         <Text style={styles.emptyText}>Waiting for scanning...</Text>
                                     )
-                                ) : (
-                                    boxList.map((item, index) => (
-                                        <React.Fragment key={item.id || index}>
-                                            {renderItem({ item, index })}
-                                        </React.Fragment>
-                                    ))
                                 )}
-                            </ScrollView>
+                            />
                         </View>
                     </ScrollView>
                 </View>
@@ -485,11 +615,7 @@ export default function DeliveryReturn({ navigation, route }: any) {
                     <TouchableOpacity
                         style={[styles.actionBtn, styles.btnPrimary]}
                         onPress={() => {
-                            if (palletCode) {
-                                navigation.navigate("DeliveryReturnSNBox", { palletCode, deliveryCode });
-                            } else {
-                                Alert.alert("Notice", "Please scan a barcode first.");
-                            }
+                            navigation.navigate("DeliveryReturnSNBox", { palletCode, deliveryCode });
                         }}
                     >
                         <Text style={styles.btnTextPrimary}>SN Details</Text>

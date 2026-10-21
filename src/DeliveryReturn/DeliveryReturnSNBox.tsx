@@ -6,6 +6,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    FlatList,
     StatusBar,
     Image,
     Dimensions,
@@ -18,7 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function DeliveryReturnSNBox({ navigation, route }: any) {
     const { palletCode, deliveryCode } = route.params;
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_userName, gs_wareCode,
+    const { gsURL, gs_factoryCode, gs_userName ,gs_wareCode,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
     } = global;
     const BASE_URL = gsURL;
@@ -50,7 +51,7 @@ export default function DeliveryReturnSNBox({ navigation, route }: any) {
                     body: JSON.stringify({
                         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
                         factoryCode: gs_factoryCode,
-                        wareHouseCode: gs_wareCode,
+                        wareHouseCode:gs_wareCode,
                         deliveryCode
                     }),
                 });
@@ -66,12 +67,8 @@ export default function DeliveryReturnSNBox({ navigation, route }: any) {
 
                 const result = await response.json();
                 console.log("box details ", result)
-                if (result.message === "success" && result.data && result.data.length > 0) {
+                if (result.message === "success" && result.data) {
                     setBoxData(result.data);
-                } else {
-                    Alert.alert("Error", "There is no product in the Pallet!");
-                    navigation.goBack();
-
                 }
             } catch (err: any) {
                 Alert.alert("Error", err.message);
@@ -86,6 +83,24 @@ export default function DeliveryReturnSNBox({ navigation, route }: any) {
     const handleReturn = () => {
         navigation.goBack();
     };
+
+    const renderItem = ({ item, index }: { item: any, index: number }) => (
+        <TouchableOpacity
+            style={[
+                styles.tableRow,
+                { backgroundColor: index % 2 === 0 ? "#FFFFFF" : "#BAE6FD" },
+                selectedItemIndex === index && styles.selectedRow
+            ]}
+            onPress={() => setSelectedItemIndex(index)}
+            activeOpacity={0.7}
+        >
+            <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
+            <Text style={[styles.cell, { width: 150 }]}>{item.palletCode || item.scanBarcodeLarge || ""}</Text>
+            <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
+            <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
+            <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+        </TouchableOpacity>
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -105,8 +120,8 @@ export default function DeliveryReturnSNBox({ navigation, route }: any) {
             <View style={styles.content}>
                 <View style={styles.formCard}>
                     <View style={styles.compactBox}>
-                        <Text style={styles.infoLabel}>Pallet Code</Text>
-                        <Text style={styles.infoValue}>{palletCode || "N/A"}</Text>
+                        <Text style={styles.infoLabel}>Total Qty</Text>
+                        <Text style={styles.infoValue}>{totalQty}</Text>
                     </View>
                 </View>
 
@@ -116,54 +131,41 @@ export default function DeliveryReturnSNBox({ navigation, route }: any) {
                             <View style={styles.tableHeader}>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Pallet Code</Text>
-                                <Text style={[styles.headerCell, { width: 60 }]}>Qty</Text>
+                                     <Text style={[styles.headerCell, { width: 60 }]}>Qty</Text>
                                 <Text style={[styles.headerCell, { width: 120 }]}>Model</Text>
-                                <Text style={[styles.headerCell, { width: 100 }]}>Color</Text>
-
+                                <Text style={[styles.headerCell, { width: 100 }]}>Color</Text>                          
+            
                             </View>
-                            <ScrollView style={{ flex: 1 }}>
-                                {loading ? (
-                                    <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
-                                ) : boxData.length === 0 ? (
-                                    <Text style={styles.emptyText}>No data found</Text>
-                                ) : (
-                                    boxData.map((item, index) => (
-                                        <TouchableOpacity
-                                            key={index}
-                                            style={[
-                                                styles.tableRow,
-                                                { backgroundColor: index % 2 === 0 ? "#FFFFFF" : "#BAE6FD" },
-                                                selectedItemIndex === index && styles.selectedRow
-                                            ]}
-                                            onPress={() => setSelectedItemIndex(index)}
-                                            activeOpacity={0.7}
-                                        >
-                                            <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
-                                            <Text style={[styles.cell, { width: 150 }]}>{item.palletCode}</Text>
-                                            <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
-                                            <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-                                            <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
-
-                                        </TouchableOpacity>
-                                    ))
+                            <FlatList
+                                data={boxData}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={renderItem}
+                                style={{ flex: 1 }}
+                                ListEmptyComponent={() => (
+                                    loading ? (
+                                        <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                    ) : (
+                                        <Text style={styles.emptyText}>No data found</Text>
+                                    )
                                 )}
-                            </ScrollView>
+                            />
                         </View>
                     </ScrollView>
                 </View>
 
                 <View style={styles.footer}>
-                    <TouchableOpacity
-                        style={[styles.detailButton, selectedItemIndex === null && styles.disabledButton]}
+                    <TouchableOpacity 
+                        style={[styles.detailButton, selectedItemIndex === null && styles.disabledButton]} 
                         onPress={() => {
                             if (selectedItemIndex === null) {
                                 Alert.alert("Selection Required", "Please select a row first to view barcode details.");
                                 return;
                             }
-                            navigation.navigate("DeliveryReturnSN", {
-                                palletCode,
-                                boxCode: boxData[selectedItemIndex].boxCode,
-                                deliveryCode
+                            const selectedItem = boxData[selectedItemIndex];
+                            navigation.navigate("DeliveryReturnSN", { 
+                                palletCode: selectedItem.palletCode || selectedItem.scanBarcodeLarge || palletCode, 
+                                boxCode: selectedItem.boxCode, 
+                                deliveryCode 
                             });
                         }}
                     >
@@ -187,7 +189,7 @@ const styles = StyleSheet.create({
     headerRight: { flexDirection: "row", alignItems: "center" },
     userNameText: { color: "#FFFFFF", fontSize: scale(12), fontWeight: "700" },
     content: { flex: 1, padding: 12 },
-    formCard: {},
+    formCard: { },
     compactBox: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderWidth: 1,
         borderColor: "#CBD5E1",
-        marginBottom: 12
+        marginBottom:12
 
     },
     infoLabel: {

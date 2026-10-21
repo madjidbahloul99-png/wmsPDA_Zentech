@@ -123,7 +123,7 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
           setBoxCode(currentBox);
         }
 
-     
+         
         setTitle(`Pallet:${currentPallet} Box:${currentBox} ${first.model} ${first.color}`);
       } else {
         setItems([]);
@@ -138,7 +138,9 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
     }
   };
 
+  
   const handleConfirm = () => {
+    console.log("SN  items[0]?.SN:",  items[0]?.SN)
     Alert.alert(
       "Confirmation",
       "Are you sure you want to confirm this operation?",
@@ -150,8 +152,8 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
             DeviceEventEmitter.emit(
               "ON_ALLOCATE_CONFIRM",
               {
-                barCode: SN,
-                scanType
+                barCode: items[0]?.SN,
+                scanType:'sn'
               }
             );
 
@@ -253,27 +255,27 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
                     {boxCode}
                   </Text>
                 </View>
-             
-              <View
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: "#0052cc",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingHorizontal: 12,
-                    paddingVertical: 4,
-                    marginBottom: 4,
-                  },
-                ]}
-              >
-                <Text style={[styles.label, { marginBottom: 0 }]}>SN</Text>
-                <Text style={{ fontSize: 13, color: "#FFFFFF", fontWeight: "700" }}>
-                  {SN}
-                </Text>
-              </View>
-               </>
+
+                <View
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: "#0052cc",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingHorizontal: 12,
+                      paddingVertical: 4,
+                      marginBottom: 4,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.label, { marginBottom: 0 }]}>SN</Text>
+                  <Text style={{ fontSize: 13, color: "#FFFFFF", fontWeight: "700" }}>
+                    {SN}
+                  </Text>
+                </View>
+              </>
             ) : (
               <>
                 <View

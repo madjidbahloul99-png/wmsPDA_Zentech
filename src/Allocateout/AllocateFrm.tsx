@@ -13,12 +13,9 @@ import {
     Image,
     Dimensions,
     DeviceEventEmitter,
-    Animated,
 } from "react-native";
 import { useGlobal } from "../../GlobalContext.tsx";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const AnimatedView = Animated.View as any;
 
 type RowType = {
     palletCode: string;
@@ -47,56 +44,10 @@ export default function AllocateFrm({ navigation, route }: any) {
     const showKeyboard = false;
 
     const inputRef = useRef<TextInput>(null);
-    const borderAnim = useRef(new Animated.Value(0)).current;
 
     const [scanState, setScanState] = useState<
         "waiting" | "scanning" | "success" | "error"
     >("waiting");
-
-    useEffect(() => {
-        let animation: Animated.CompositeAnimation | null = null;
-
-        if (scanState === "waiting") {
-            animation = Animated.loop(
-                Animated.sequence([
-                    Animated.timing(borderAnim, {
-                        toValue: 1,
-                        duration: 700,
-                        useNativeDriver: false,
-                    }),
-                    Animated.timing(borderAnim, {
-                        toValue: 0,
-                        duration: 700,
-                        useNativeDriver: false,
-                    }),
-                ])
-            );
-            animation.start();
-        } else {
-            borderAnim.setValue(1);
-        }
-
-        return () => {
-            animation?.stop();
-        };
-    }, [scanState]);
-
-    const animatedBorderColor = borderAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange:
-            scanState === "waiting"
-                ? ["#0052cc", "#60a5fa"]
-                : scanState === "scanning"
-                    ? ["#f59e0b", "#fbbf24"]
-                    : scanState === "success"
-                        ? ["#16a34a", "#4ade80"]
-                        : ["#dc2626", "#f87171"],
-    });
-
-    const animatedBorderWidth = borderAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, 4],
-    });
 
     const ensureFocus = () => {
         if (inputRef.current) {
@@ -203,8 +154,8 @@ export default function AllocateFrm({ navigation, route }: any) {
                     }
                 }
             }
-        } catch (error) {
-            console.error("Error fetching AllocateList:", error);
+        } catch (error: any) {
+             Alert.alert("error", error.message );
         }
     }, [token, BASE_URL, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, gs_factoryCode, gs_wareCode]);
 
@@ -372,9 +323,9 @@ export default function AllocateFrm({ navigation, route }: any) {
                 return;
             }
 
-            if (scanType === "sn") {
+            if (scanType === "sn" ||  scanType === "imei") {
                 setScanState("success");
-                navigation.navigate("AllocateSNConfirm", {
+                navigation.navigate("AllocateSNConfirm", {                 
                     fromWareHouseCode: gs_wareCode,
                     palletCode: "",
                     boxCode: "",
@@ -489,10 +440,10 @@ export default function AllocateFrm({ navigation, route }: any) {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <AnimatedView style={{
+                        <View style={{
                             borderRadius: 10,
-                            borderWidth: animatedBorderWidth,
-                            borderColor: animatedBorderColor,
+                            borderWidth: scanState === "waiting" ? 1 : 2,
+                            borderColor: scanState === "waiting" ? "#0052cc" : scanState === "scanning" ? "#f59e0b" : scanState === "success" ? "#16a34a" : "#dc2626",
                             backgroundColor: "#e2f0eeff",
                             elevation: 2,
                         }}>
@@ -511,7 +462,7 @@ export default function AllocateFrm({ navigation, route }: any) {
                                 blurOnSubmit={false}
                                 onBlur={ensureFocus}
                             />
-                        </AnimatedView>
+                        </View>
                     </View>
                 </View>
 

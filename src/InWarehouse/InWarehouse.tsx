@@ -13,13 +13,10 @@ import {
     Image,
     Dimensions,
     DeviceEventEmitter,
-    Animated,
 } from "react-native";
 import { useGlobal } from "../../GlobalContext.tsx";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const AnimatedView = Animated.View as any;
 
 interface BoxItem {
     id: string;
@@ -46,61 +43,9 @@ export default function InWarehouse({ navigation, route }: any) {
     const snInputRef = useRef<TextInput>(null);
     const isScanning = useRef(false);
     const scanTimer = useRef<any>(null);
-    const borderAnim = useRef(new Animated.Value(0)).current;
-
     const [scanState, setScanState] = useState<
         "waiting" | "scanning" | "success" | "error"
     >("waiting");
-
-    useEffect(() => {
-
-        let animation: Animated.CompositeAnimation | null = null;
-
-        if (scanState === "waiting") {
-
-            animation = Animated.loop(
-                Animated.sequence([
-                    Animated.timing(borderAnim, {
-                        toValue: 1,
-                        duration: 700,
-                        useNativeDriver: false,
-                    }),
-                    Animated.timing(borderAnim, {
-                        toValue: 0,
-                        duration: 700,
-                        useNativeDriver: false,
-                    }),
-                ])
-            );
-
-            animation.start();
-
-        } else {
-            borderAnim.setValue(1);
-        }
-
-        return () => {
-            animation?.stop();
-        };
-
-    }, [scanState]);
-
-    const animatedBorderColor = borderAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange:
-            scanState === "waiting"
-                ? ["#0052cc", "#60a5fa"]
-                : scanState === "scanning"
-                    ? ["#f59e0b", "#fbbf24"]
-                    : scanState === "success"
-                        ? ["#16a34a", "#4ade80"]
-                        : ["#dc2626", "#f87171"],
-    });
-
-    const animatedBorderWidth = borderAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [1, 4],
-    });
 
     useFocusEffect(
         useCallback(() => {
@@ -382,10 +327,10 @@ export default function InWarehouse({ navigation, route }: any) {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <AnimatedView style={{
+                        <View style={{
                             borderRadius: 10,
-                            borderWidth: animatedBorderWidth,
-                            borderColor: animatedBorderColor,
+                            borderWidth: scanState === "waiting" ? 1 : 2,
+                            borderColor: scanState === "waiting" ? "#0052cc" : scanState === "scanning" ? "#f59e0b" : scanState === "success" ? "#16a34a" : "#dc2626",
                             backgroundColor: "#e2f0eeff",
                             elevation: 32,
                         }}>
@@ -394,7 +339,7 @@ export default function InWarehouse({ navigation, route }: any) {
                                 style={[
                                     styles.input,
                                     gs_wareType !== "MainWarehouse" && styles.disabledInput,
-                                    { borderWidth: 0, elevation: 0 } // Move border/elevation to parent Animated.View
+                                    { borderWidth: 0, elevation: 0 }
                                 ]}
                                 value={sn}
                                 onChangeText={handleSnChange}
@@ -407,7 +352,7 @@ export default function InWarehouse({ navigation, route }: any) {
                                 editable={gs_wareType === "MainWarehouse"}
                                 placeholderTextColor="#334155"
                             />
-                        </AnimatedView>
+                        </View>
                     </View>
                 </View>
 

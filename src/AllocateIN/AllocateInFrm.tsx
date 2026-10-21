@@ -151,10 +151,10 @@ export default function AllocateInFrm({ navigation, route }: any) {
                 const row = Array.isArray(result.data)
                     ? result.data[0]
                     : result.data;
-               
+
                 if (row.isok === "1") {
                     setToCk(row.fromckName || "");
-                    
+
                 } else {
                     Alert.alert("Error", row.retstr || "Check failed");
                     navigation.goBack();
@@ -167,6 +167,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
         } finally {
             setLoading(false);
         }
+
     }, [allocateCode, gs_factoryCode, gs_wareCode, BASE_URL, token, navigation]);
 
 
@@ -185,7 +186,8 @@ export default function AllocateInFrm({ navigation, route }: any) {
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, },
                 body: JSON.stringify({
                     operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
-                    factoryCode: gs_factoryCode, scanCode: barcode
+                    factoryCode: gs_factoryCode,
+                    scanCode: barcode
                 }),
             });
 
@@ -200,15 +202,18 @@ export default function AllocateInFrm({ navigation, route }: any) {
             }
 
 
+
             const result = await response.json();
+
+            console.log("response de type de scan", result)
 
             if (result.code === 500) {
                 Alert.alert("Error", result.message);
                 navigation.goBack();
                 return;
             }
-            if (result.message === 'success' && result.data && result.data.length > 0) {
-                return result.data[0].scanType;
+            if (result.message === 'success') {
+                return result.data.scanType;
             }
             return "";
         } catch (err) {
@@ -292,10 +297,12 @@ export default function AllocateInFrm({ navigation, route }: any) {
     useEffect(() => {
         const sub = DeviceEventEmitter.addListener(
             "ALLOCATE_IN_SN_CONFIRM",
-            (data) => {
+            async (data) => {
                 const code = data.barCode || data.SN;
 
-                palletDeal(code, data.scanType);
+                await palletDeal(code, data.scanType);
+                setSn("");
+                snRef.current?.focus();
             }
         );
 
@@ -315,7 +322,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
             let scanType = await getType(barcode);
             //delet it after both
             //if (scanType == "") { scanType = "sn"; }
-            if (barcode == "P0844230016") { scanType = "pallet"; }
+            console.log("resultat de type de scan", scanType);
             setLoading(false);
 
             if (scanType === "pallet" || scanType === "box") {
@@ -325,8 +332,9 @@ export default function AllocateInFrm({ navigation, route }: any) {
                     barCode: barcode,
                     scanType
                 });
-            } else if (scanType === "sn") {
+            } else if (scanType === "sn" || scanType === "imei") {
                 setScanState("success");
+                 setSn(""); 
                 navigation.navigate("AllocateInSNConfirm", {
                     allocateCode,
                     palletCode: "",

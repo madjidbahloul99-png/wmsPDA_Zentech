@@ -6,6 +6,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    FlatList,
     StatusBar,
     Image,
     Dimensions,
@@ -18,7 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function DeliveryReturnSN({ navigation, route }: any) {
     const { palletCode, boxCode, deliveryCode } = route.params;
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_userName, gs_wareCode,
+    const { gsURL, gs_factoryCode, gs_userName, gs_wareCode ,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
     } = global;
     const BASE_URL = gsURL;
@@ -70,13 +71,8 @@ export default function DeliveryReturnSN({ navigation, route }: any) {
 
                 const result = await response.json();
                 console.log("SN details ", result)
-                if (result.message === "success" && result.data && result.data.length > 0) {
+                if (result.message === "success" && result.data) {
                     setSnData(result.data);
-                }
-                else {
-                    Alert.alert("Error", "There is no product in the box!");
-                    navigation.goBack();
-
                 }
             } catch (err: any) {
                 Alert.alert("Error", err.message);
@@ -91,6 +87,24 @@ export default function DeliveryReturnSN({ navigation, route }: any) {
     const handleReturn = () => {
         navigation.goBack();
     };
+
+    const renderItem = ({ item, index }: { item: any, index: number }) => (
+        <TouchableOpacity
+            style={[
+                styles.tableRow,
+                { backgroundColor: index % 2 === 0 ? "#FFFFFF" : "#BAE6FD" },
+                selectedItemIndex === index && styles.selectedRow
+            ]}
+            onPress={() => setSelectedItemIndex(index)}
+            activeOpacity={0.7}
+        >
+            <Text style={[styles.cell, { width: 150 }]}>{item.sn}</Text>
+            <Text style={[styles.cell, { width: 150 }]}>{item.imeiCode1}</Text>
+            <Text style={[styles.cell, { width: 150 }]}>{item.imeiCode2}</Text>
+            <Text style={[styles.cell, { width: 150 }]}>{item.imeiCode3}</Text>
+            <Text style={[styles.cell, { width: 200 }]}>{item.createDate}</Text>
+        </TouchableOpacity>
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -131,34 +145,21 @@ export default function DeliveryReturnSN({ navigation, route }: any) {
                                 <Text style={[styles.headerCell, { width: 150 }]}>IMEI1</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>IMEI2</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>IMEI3</Text>
-                                <Text style={[styles.headerCell, { width: 150 }]}>Storage Time</Text>
+                                <Text style={[styles.headerCell, { width: 200 }]}>Storage Time</Text>
                             </View>
-                            <ScrollView style={{ flex: 1 }}>
-                                {loading ? (
-                                    <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
-                                ) : snData.length === 0 ? (
-                                    <Text style={styles.emptyText}>No data found</Text>
-                                ) : (
-                                    snData.map((item, index) => (
-                                        <TouchableOpacity
-                                            key={index}
-                                            style={[
-                                                styles.tableRow,
-                                                { backgroundColor: index % 2 === 0 ? "#FFFFFF" : "#BAE6FD" },
-                                                selectedItemIndex === index && styles.selectedRow
-                                            ]}
-                                            onPress={() => setSelectedItemIndex(index)}
-                                            activeOpacity={0.7}
-                                        >
-                                            <Text style={[styles.cell, { width: 150 }]}>{item.sn}</Text>
-                                            <Text style={[styles.cell, { width: 150 }]}>{item.imeiCode1}</Text>
-                                            <Text style={[styles.cell, { width: 150 }]}>{item.imeiCode2}</Text>
-                                            <Text style={[styles.cell, { width: 150 }]}>{item.imeiCode3}</Text>
-                                            <Text style={[styles.cell, { width: 150 }]}>{item.createDate}</Text>
-                                        </TouchableOpacity>
-                                    ))
+                            <FlatList
+                                data={snData}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={renderItem}
+                                style={{ flex: 1 }}
+                                ListEmptyComponent={() => (
+                                    loading ? (
+                                        <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                    ) : (
+                                        <Text style={styles.emptyText}>No data found</Text>
+                                    )
                                 )}
-                            </ScrollView>
+                            />
                         </View>
                     </ScrollView>
                 </View>
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     headerRight: { flexDirection: "row", alignItems: "center" },
     userNameText: { color: "#FFFFFF", fontSize: scale(12), fontWeight: "700" },
     content: { flex: 1, padding: 12 },
-    formCard: { marginBottom: 8 },
+    formCard: { marginBottom:8},
     compactBox: {
         flexDirection: 'row',
         justifyContent: 'space-between',

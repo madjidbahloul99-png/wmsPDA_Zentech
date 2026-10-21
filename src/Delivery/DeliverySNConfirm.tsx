@@ -145,6 +145,7 @@ export default function DeliverySNConfirm({ navigation, route }: any) {
             setLoading(false);
         }
     };
+    console.log("details",  details[0]?.sn);
 
     const handleConfirm = () => {
         if (details.length < 1) {
@@ -166,8 +167,8 @@ export default function DeliverySNConfirm({ navigation, route }: any) {
                         DeviceEventEmitter.emit(
                             "ON_DELIVERY_CONFIRM_OK",
                             {
-                                barCode: SN,
-                                scanType
+                                barCode: details[0]?.sn,
+                                scanType :'sn'
                             }
                         );
 

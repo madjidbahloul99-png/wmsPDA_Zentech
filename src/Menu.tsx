@@ -11,24 +11,25 @@ import {
   Image,
 } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
 import { useGlobal } from "../GlobalContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width } = Dimensions.get("window");
 
 const menuItems = [
-  { title: "Warehousing\nScanning", icon: require("../assets/logomenu/Inwarehouse.png"), screen: "InWarehouse", fcode: "button_in" },
-  { title: "Allocate Into\nWarehouse", icon: require("../assets/logomenu/AllocateIn.png"), screen: "AllocateInNO", fcode: "button_DBIn" },
-  { title: "Allocate Out", icon: require("../assets/logomenu/Allocateout.png"), screen: "AllocateSAP", fcode: "button_DBOutSAP" },
-  { title: "Delivery", icon: require("../assets/logomenu/Delivery.png"), screen: "DeliverySAP", fcode: "button_fahuoSAP" },
-  { title: "Allocate Return\nInto WH", icon: require("../assets/logomenu/reject.png"), screen: "AllocateRejectIn", fcode: "btnAllocateRejectIn" },
-  { title: "Delivery\nReturn", icon: require("../assets/logomenu/DeliveryReturn.png"), screen: "DeliveryReturnNo", fcode: "btnDeliveryReturn" },
-  { title: "Inventory\nVerification", icon: require("../assets/logomenu/inventory1.png"), screen: "PD", fcode: "button_pd" },
-  { title: "Pallet\nSearch", icon: require("../assets/logomenu/searchpallet.png"), screen: "PalletSearch", fcode: "button_pallerCx" },
-  { title: "Not In\nWare", icon: require("../assets/logomenu/Notinware.png"), screen: "PalletNotIn", fcode: "btnNotIn" },
-  { title: "Box/Pallet\nAssembly", icon: require("../assets/logomenu/Assembly.png"), screen: "Assembly", fcode: "button_boxZu" },
-  { title: "Box/Pallet\nDisassembly", icon: require("../assets/logomenu/Disassembly.png"), screen: "Disassembly", fcode: "button_boxChai" },
-  { title: "SN\nReturn", icon: require("../assets/logomenu/SNReturn.png"), screen: "SNReturn", fcode: "btnReturnSN" },
-  { title: "Distributor\nReturn", icon: require("../assets/logomenu/DistributorReturn.png"), screen: "DistributorReturnNo", fcode: "btnDistributeReturn" },
+  { title: "Warehousing\nScanning", icon: require("../assets/logomenu/Inwarehouse.png"), screen: "InWarehouse", fcode: "button_in", disabled: false },
+  { title: "Allocate Into\nWarehouse", icon: require("../assets/logomenu/AllocateIn.png"), screen: "AllocateInNO", fcode: "button_DBIn", disabled: false },
+  { title: "Allocate Out", icon: require("../assets/logomenu/Allocateout.png"), screen: "AllocateSAP", fcode: "button_DBOutSAP", disabled: false },
+  { title: "Delivery", icon: require("../assets/logomenu/Delivery.png"), screen: "DeliverySAP", fcode: "button_fahuoSAP", disabled: false },
+  { title: "Allocate Return\nInto WH", icon: require("../assets/logomenu/reject.png"), screen: "AllocateRejectIn", fcode: "btnAllocateRejectIn", disabled: false },
+  { title: "Delivery\nReturn", icon: require("../assets/logomenu/DeliveryReturn.png"), screen: "DeliveryReturnNo", fcode: "btnDeliveryReturn", disabled: false },
+  { title: "Inventory\nVerification", icon: require("../assets/logomenu/inventory1.png"), screen: "PD", fcode: "button_pd", disabled: false },
+  { title: "Pallet\nSearch", icon: require("../assets/logomenu/searchpallet.png"), screen: "PalletSearch", fcode: "button_pallerCx", disabled: false },
+  { title: "Not In\nWare", icon: require("../assets/logomenu/Notinware.png"), screen: "PalletNotIn", fcode: "btnNotIn", disabled: false },
+  { title: "Box/Pallet\nAssembly", icon: require("../assets/logomenu/Assembly.png"), screen: "Assembly", fcode: "button_boxZu", disabled: false },
+  { title: "Box/Pallet\nDisassembly", icon: require("../assets/logomenu/Disassembly.png"), screen: "Disassembly", fcode: "button_boxChai", disabled: false },
+  { title: "SN\nReturn", icon: require("../assets/logomenu/SNReturn.png"), screen: "SNReturn", fcode: "btnReturnSN", disabled: true },
+  { title: "Distributor\nReturn", icon: require("../assets/logomenu/DistributorReturn.png"), screen: "DistributorReturnNo", fcode: "btnDistributeReturn", disabled: true },
   /*{ title: "Allocate Out\nWarehouse", icon: "🚚", screen: "/", fcode: "button_DBOut" },
  { title: "Warehouse\nDelivery", icon: "📦", screen: "/", fcode: "button_fahuo" },
  */
@@ -178,41 +179,57 @@ export default function Menu({ navigation }: any) {
     );
   };
 
+  const formatUserName = (name: string) => {
+    if (!name) return "";
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0];
+    const firstName = parts[0];
+    const lastNameFirstChar = parts[parts.length - 1].charAt(0).toUpperCase();
+    return `${lastNameFirstChar}. ${firstName} `;
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
+      <LinearGradient
+        colors={['#f391f7ff', '#0052cc']}
+        start={{ x: 1, y: 1 }}
+        end={{ x: 1, y: 0}}
+        style={styles.headerContainer}
+      >
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
+              <Image
+                source={require("../assets/logo/left.png")}
+                style={styles.returnLogo}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Warehouse Management</Text>
+          </View>
+        </View>
+
+        <View style={styles.subHeader}>
+          <View style={styles.subHeaderItem}>
             <Image
-              source={require("../assets/logo/left.png")}
-              style={styles.returnLogo}
+              source={require("../assets/logo/user.png")}
+              style={styles.subHeaderIcon}
               resizeMode="contain"
             />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Warehouse Management</Text>
+            <Text style={styles.subHeaderText}>{formatUserName(gs_userName)}</Text>
+          </View>
+          <View style={styles.subHeaderItem}>
+            <Image
+              source={require("../assets/logo/warehouse.png")}
+              style={styles.subHeaderIcon}
+              resizeMode="contain"
+            />
+            <Text style={styles.subHeaderText}>{gs_wareName}</Text>
+          </View>
         </View>
-      </View>
-
-      <View style={styles.subHeader}>
-        <View style={styles.subHeaderItem}>
-          <Image
-            source={require("../assets/logo/user.png")}
-            style={styles.subHeaderIcon}
-            resizeMode="contain"
-          />
-          <Text style={styles.subHeaderText}>{gs_userName}</Text>
-        </View>
-        <View style={styles.subHeaderItem}>
-          <Image
-            source={require("../assets/logo/warehouse.png")}
-            style={styles.subHeaderIcon}
-            resizeMode="contain"
-          />
-          <Text style={styles.subHeaderText}>{gs_wareName}</Text>
-        </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
@@ -222,7 +239,7 @@ export default function Menu({ navigation }: any) {
 
         <View style={styles.grid}>
           {menuItems.map((item, index) => {
-            const isEnabled = item.fcode ? allowedMenus.includes(item.fcode) : false;
+            const isEnabled = (item.fcode ? allowedMenus.includes(item.fcode) : false) && !item.disabled;
             //const isEnabled = true;
             return (
               <TouchableOpacity
@@ -263,14 +280,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAFC",
   },
 
+  headerContainer: {
+    elevation: 4,
+  },
+
   header: {
-    backgroundColor: "#0052cc",
     paddingHorizontal: width * 0.05,
     height: scale(56),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    elevation: 4,
   },
 
   headerLeft: {
@@ -305,14 +324,10 @@ const styles = StyleSheet.create({
 
   subHeader: {
     flexDirection: 'row',
-    backgroundColor: '#0052cc',
     paddingHorizontal: 20,
     paddingBottom: 12,
     justifyContent: 'space-between',
     alignItems: 'center',
-    elevation: 4,
-    marginTop: -12, // overlap slightly to avoid gap
-    marginLeft: -14,
   },
   subHeaderItem: {
     flexDirection: 'row',

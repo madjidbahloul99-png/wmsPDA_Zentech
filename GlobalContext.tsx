@@ -84,8 +84,9 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
 
 
 
-  const [gsURL, _setgsgsURL] = useState("https://zwmsapi.condor.dz");
-  //const [gsURL, _setgsgsURL] = useState("http://192.168.137.84:7278"); 
+ //const [gsURL, _setgsgsURL] = useState("https://zwmsapi.condor.dz"); 
+const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW");   
+  //const [gsURL, _setgsgsURL] = useState("http://192.168.100.24:7278"); 
 
   // BaseSignInfo
   const [operateUserCode, _setOperateUserCode] = useState("");
@@ -93,7 +94,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [operateWareHouseCode, _setOperateWareHouseCode] = useState("");
   const [operateRandomNumber, _setOperateRandomNumber] = useState("");
   const [operateSign, _setOperateSign] = useState("");
-  const [operateVersion, _setOperateVersion] = useState("1.0");
+  const [operateVersion, _setOperateVersion] = useState("1.0.1");
 
   // Factory
   const [gs_factoryCode, _setFactoryCode] = useState("001");

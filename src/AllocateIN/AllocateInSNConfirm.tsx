@@ -34,7 +34,7 @@ interface SNConfirmDetail {
 export default function AllocateInSNConfirm({ navigation, route }: any) {
   const { allocateCode, palletCode, boxCode, SN, scanType, showConfirm, onConfirm } = route.params || {};
   const global = useGlobal();
-  const { gsURL, gs_factoryCode, gs_userName ,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,} = global;
+  const { gsURL, gs_factoryCode, gs_userName, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
   const BASE_URL = gsURL;
   const [token, setToken] = useState("");
 
@@ -129,7 +129,7 @@ export default function AllocateInSNConfirm({ navigation, route }: any) {
     }
   }, [fetchDetails, token]);
 
-
+console.log("AllocateInSNConfirm params", details[0]?.SN);
 
   const handleConfirm = () => {
     Alert.alert(
@@ -141,12 +141,13 @@ export default function AllocateInSNConfirm({ navigation, route }: any) {
           text: "Yes",
           onPress: () => {
             console.log("handleConfirm triggered, emitting ALLOCATE_IN_SN_CONFIRM with:", SN, scanType);
+
             DeviceEventEmitter.emit('ALLOCATE_IN_SN_CONFIRM', {
               allocateCode,
               palletCode,
               boxCode,
-              SN,
-              scanType
+              SN: details[0]?.SN,
+              scanType:'sn'
             });
             navigation.goBack();
           }
@@ -313,7 +314,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-     marginBottom:-4
+    marginBottom: -4
   },
   statLabel: { color: "#FFFFFF", fontSize: 13, fontWeight: "700", textTransform: "uppercase" },
   statValue: { color: "#FFFFFF", fontSize: 13, fontWeight: "800" },

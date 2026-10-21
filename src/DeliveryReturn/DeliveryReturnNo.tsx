@@ -7,10 +7,12 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    FlatList,
     StatusBar,
     Image,
     Dimensions,
     Alert,
+    ActivityIndicator,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useGlobal } from "../../GlobalContext.tsx";
@@ -89,11 +91,6 @@ export default function DeliveryReturnNo({ navigation }: any) {
             }
 
             const result = await response.json();
-
-            if (result.code === 500) {
-                Alert.alert("Error", result.message);
-                return;
-            }
             const newItems: DeliveryReturnItem[] = [];
             let tock = "";
 
@@ -125,7 +122,7 @@ export default function DeliveryReturnNo({ navigation }: any) {
             }
 
             setFSystemDeliveryCode(deliveryCode);
-
+            
 
         } catch (err: any) {
             setErrorMsg("Error: " + err.message);
@@ -177,11 +174,12 @@ export default function DeliveryReturnNo({ navigation }: any) {
 
     const handleChoice = () => {
         if (selectedItemIndex !== null && items[selectedItemIndex]) {
-            const { deliveryCode, systemDeliveryCode, toWareHouse } = items[selectedItemIndex];
+            const { deliveryCode, systemDeliveryCode, toWareHouse, qty } = items[selectedItemIndex];
             navigation.navigate('DeliveryReturn', {
                 deliveryCode,
                 systemDeliveryCode,
-                tock: toWareHouse
+                tock: toWareHouse,
+                totalQty: qty
             });
         } else {
             setErrorMsg("Please select an item first");
@@ -238,6 +236,11 @@ export default function DeliveryReturnNo({ navigation }: any) {
             </View>
 
             <View style={styles.content}>
+                {loading && (
+                    <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.4)', zIndex: 10 }]}>
+                        <ActivityIndicator size="large" color="#0052cc" />
+                    </View>
+                )}
                 {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
 
                 <TextInput
@@ -267,19 +270,17 @@ export default function DeliveryReturnNo({ navigation }: any) {
                                 <Text style={[styles.headerCell, { width: 60 }]}>Diff</Text>
                                 <Text style={[styles.headerCell, { width: 100 }]}>To</Text>
                             </View>
-                            <ScrollView style={{ flex: 1 }}>
-                                {items.length === 0 ? (
+                            <FlatList
+                                data={items}
+                                keyExtractor={(item, index) => item.deliveryCode + "_" + index}
+                                renderItem={renderItem}
+                                style={{ flex: 1 }}
+                                ListEmptyComponent={() => (
                                     <View style={{ width: 820 }}>
                                         <Text style={[styles.emptyText, { width: '100%' }]}>Waiting for Scanning...</Text>
                                     </View>
-                                ) : (
-                                    items.map((item, index) => (
-                                        <React.Fragment key={item.deliveryCode + "_" + index}>
-                                            {renderItem({ item, index })}
-                                        </React.Fragment>
-                                    ))
                                 )}
-                            </ScrollView>
+                            />
                         </View>
                     </ScrollView>
                 </View>
