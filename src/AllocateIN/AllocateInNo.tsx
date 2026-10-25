@@ -57,7 +57,7 @@ export default function AllocateInNO({ navigation }: any) {
     useEffect(() => {
         const loadToken = async () => {
             const t = await AsyncStorage.getItem("userToken");
-            console.log("TOKEN IN AllocateIN", t);
+            //console.log("TOKEN IN AllocateIN", t);
             if (t) setToken(t);
         };
 
@@ -156,6 +156,8 @@ export default function AllocateInNO({ navigation }: any) {
             }
 
             setItems(newItems);
+
+            //old condition : tock !== "" && tock !== gs_wareCode
 
             if (tock !== "" && tock !== gs_wareCode) {
                 setErrorMsg("To WareHouse Must be Login WareHouse " + gs_wareCode);

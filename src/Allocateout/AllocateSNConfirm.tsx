@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   View,
@@ -44,6 +44,11 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
   const [title, setTitle] = useState("");
   const [palletCode, setPalletCode] = useState(initialPalletCode || "");
   const [boxCode, setBoxCode] = useState(initialBoxCode || "");
+
+  // Protection anti double confirmation (double tap sur Confirm)
+  const [confirmed, setConfirmed] = useState(false);
+  const confirmedRef = useRef(false);
+  const alertOpenRef = useRef(false);
 
 
   useEffect(() => {
@@ -140,15 +145,29 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
 
   
   const handleConfirm = () => {
+    // Déjà confirmé, ou une alerte est déjà ouverte (double tap)
+    if (confirmedRef.current || alertOpenRef.current) return;
+    alertOpenRef.current = true;
+
     console.log("SN  items[0]?.SN:",  items[0]?.SN)
     Alert.alert(
       "Confirmation",
       "Are you sure you want to confirm this operation?",
       [
-        { text: "Cancel", style: "cancel" },
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {
+            alertOpenRef.current = false;
+          }
+        },
         {
           text: "Yes",
           onPress: () => {
+            if (confirmedRef.current) return;
+            confirmedRef.current = true;
+            setConfirmed(true);
+
             DeviceEventEmitter.emit(
               "ON_ALLOCATE_CONFIRM",
               {
@@ -160,7 +179,13 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
             navigation.goBack();
           }
         }
-      ]
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => {
+          alertOpenRef.current = false;
+        }
+      }
     );
   };
 
@@ -374,8 +399,9 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
       <View style={styles.footer}>
         {showConfirm && (
           <TouchableOpacity
-            style={[styles.actionBtn, styles.btnPrimary]}
+            style={[styles.actionBtn, styles.btnPrimary, confirmed && styles.btnDisabled]}
             onPress={handleConfirm}
+            disabled={confirmed}
             activeOpacity={0.8}
           >
             <Text style={styles.btnTextPrimary}>Confirm</Text>
@@ -446,5 +472,6 @@ const styles = StyleSheet.create({
   footer: { padding: 10 },
   actionBtn: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   btnPrimary: { backgroundColor: '#2563eb' },
+  btnDisabled: { backgroundColor: '#94A3B8' },
   btnTextPrimary: { color: '#fff', fontSize: 15, fontWeight: '800' },
 });

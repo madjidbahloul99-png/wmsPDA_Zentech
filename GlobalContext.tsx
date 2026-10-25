@@ -94,7 +94,7 @@ const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW"
   const [operateWareHouseCode, _setOperateWareHouseCode] = useState("");
   const [operateRandomNumber, _setOperateRandomNumber] = useState("");
   const [operateSign, _setOperateSign] = useState("");
-  const [operateVersion, _setOperateVersion] = useState("1.0.1");
+  const [operateVersion, _setOperateVersion] = useState("1.0.2");
 
   // Factory
   const [gs_factoryCode, _setFactoryCode] = useState("001");
