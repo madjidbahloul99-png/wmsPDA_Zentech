@@ -31,6 +31,9 @@ type GlobalContextType = {
   gs_factoryCode: string;
   setgs_factoryCode: (v: string) => void;
 
+    gs_factoryindex: string;
+  setgs_factoryindex: (v: string) => void;
+
   // Warehouse
   gs_wareCode: string;
   setgs_wareCode: (v: string) => void;
@@ -83,9 +86,10 @@ const GlobalContext = createContext<GlobalContextType | null>(null);
 export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
 
 
+//change gsURL according to the environment you want to use, "https://zwmsapi.condor.dz" or "https://mespdamobile.condor.dz/WMSPDANEW" or "http://
 
- //const [gsURL, _setgsgsURL] = useState("https://zwmsapi.condor.dz"); 
-const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW");   
+ const [gsURL, _setgsgsURL] = useState("https://zwmsapi.condor.dz"); 
+//const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW");   
   //const [gsURL, _setgsgsURL] = useState("http://192.168.100.24:7278"); 
 
   // BaseSignInfo
@@ -97,7 +101,11 @@ const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW"
   const [operateVersion, _setOperateVersion] = useState("1.0.2");
 
   // Factory
+  //change gs_factoryindex according to the factory you want to use, "zentech" or "mobile"
+  
   const [gs_factoryCode, _setFactoryCode] = useState("001");
+  const [gs_factoryindex, _setFactoryindex] = useState("zentech");
+  //const [gs_factoryindex, _setFactoryindex] = useState("mobile");
 
   // Warehouse
   const [gs_wareCode, _setWareCode] = useState("");
@@ -161,6 +169,9 @@ const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW"
 
         gs_factoryCode,
         setgs_factoryCode: _setFactoryCode,
+
+         gs_factoryindex,
+        setgs_factoryindex: _setFactoryindex,
 
         gs_wareCode,
         setgs_wareCode: _setWareCode,

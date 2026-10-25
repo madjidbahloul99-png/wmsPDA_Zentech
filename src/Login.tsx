@@ -41,6 +41,7 @@ import lockIcon from "../assets/logo/lock.png";
 import warehouseIcon from "../assets/logo/warehouse.png";
 import settingsIcon from "../assets/logo/settings.png";
 import condorLogo from "../assets/logo/condor_logo.png";
+import zentechLogo from "../assets/logo/zentech_logo.png";
 
 
 /* =====================
@@ -199,9 +200,9 @@ export default function Login({ navigation }: any) {
         setOperateUserName,
         setOperateWareHouseCode,
         setOperateRandomNumber, setOperateSign,
-        operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion
+        operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
+        gs_factoryindex,
     } = useGlobal();
-
 
     const [userCode, setUserCode] = useState("");
     const [password, setPassword] = useState("");
@@ -1101,9 +1102,9 @@ export default function Login({ navigation }: any) {
                             }}
                         >
                             <Image
-                                source={condorLogo}
-                                style={styles.condorLogo}
-                                resizeMode="stretch"
+                                source={gs_factoryindex === "zentech" ? zentechLogo : condorLogo}
+                                style={gs_factoryindex === "zentech" ? styles.zentechLogo : styles.condorLogo}
+                                resizeMode={gs_factoryindex === "zentech" ? "contain" : "stretch"}
                             />
 
                         </TouchableOpacity>
@@ -1127,7 +1128,7 @@ export default function Login({ navigation }: any) {
 
                     {loading && (
                         <View style={styles.loadingOverlay}>
-                            <ActivityIndicator size="large" color="#0052cc" />
+                            <ActivityIndicator size="large" color={gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc"} />
                             <Text style={styles.loadingText}>Processing QR Scan...</Text>
                         </View>
                     )}
@@ -1221,10 +1222,20 @@ export default function Login({ navigation }: any) {
 
                     <View style={styles.buttonContainer}>
                         <LinearGradient
-                            colors={['#f391f7ff', '#0052cc']}
+                            colors={
+                                gs_factoryindex === "zentech"
+                                    ? ['#06b86c', '#048a50']
+                                    : ['#2563eb', '#0052cc']
+                            }
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
-                            style={styles.gradientButton}
+                            style={[
+                                styles.gradientButton,
+                                {
+                                    backgroundColor:
+                                        gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc",
+                                }
+                            ]}
                         >
                             <TouchableOpacity
                                 style={styles.button}
@@ -1248,6 +1259,7 @@ export default function Login({ navigation }: any) {
                                 onChangeText={setTempURL}
                                 placeholder="Server URL"
                             />
+
                             <View style={styles.modalButtons}>
                                 <TouchableOpacity
                                     style={[styles.modalBtn, styles.cancelBtn]}
@@ -1341,6 +1353,11 @@ const styles = StyleSheet.create({
     },
 
     condorLogo: {
+        width: "100%",
+        height: scale(160),
+    },
+
+    zentechLogo: {
         width: "100%",
         height: scale(160),
     },
