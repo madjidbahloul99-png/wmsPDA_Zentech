@@ -31,10 +31,11 @@ type PalletDetail = {
 
 
 export default function DeliverySNConfirmBox({ navigation, route }: any) {
-    const { gsURL, setgs_gsURL } = useGlobal();
+    const { gsURL, setgs_gsURL, gs_factoryindex } = useGlobal();
     const BASE_URL = gsURL;
     const { fromWareHouseCode, barCode, scanType, showConfirm } = route.params || {};
     const global = useGlobal();
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -199,7 +200,7 @@ export default function DeliverySNConfirmBox({ navigation, route }: any) {
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleExit} activeOpacity={0.7}>
                         <Image
@@ -218,7 +219,7 @@ export default function DeliverySNConfirmBox({ navigation, route }: any) {
 
             <View style={styles.statsCard}>
                 {scanType === "pallet" && (
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Pallet</Text>
                         <TextInput
                             style={styles.statInput}
@@ -229,7 +230,7 @@ export default function DeliverySNConfirmBox({ navigation, route }: any) {
                     </View>
                 )}
                 {(scanType === "sn" || scanType === "box") && (
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Box</Text>
                         <TextInput
                             style={styles.statInput}
@@ -239,17 +240,17 @@ export default function DeliverySNConfirmBox({ navigation, route }: any) {
                         />
                     </View>
                 )}
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Total Qty</Text>
                     <Text style={styles.statValue}>{totalQty || "0"}</Text>
                 </View>
             </View>
 
             {/* List Card */}
-            <View style={styles.tableCard}>
+            <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                     <View style={{ width: totalTableWidth }}>
-                        <View style={styles.tableHeader}>
+                        <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                             {columns.map((col) => (
                                 <Text key={col.label} style={[styles.headerCell, { width: col.width }]}>
                                     {col.label}
@@ -273,7 +274,7 @@ export default function DeliverySNConfirmBox({ navigation, route }: any) {
                                         <Text style={[styles.cell, { width: columns[1].width }]}>{item.boxCode}</Text>
                                         <Text style={[styles.cell, { width: columns[2].width }]}>{item.qty}</Text>
                                         <Text style={[styles.cell, { width: columns[3].width }]}>{item.model}</Text>
-                                        <Text style={[styles.cell, { width: columns[4].width }]}>{item.color}</Text>
+                                        <Text style={[styles.cell, { width: columns[4].width, color: factoryColor }]}>{item.color}</Text>
                                         <Text style={[styles.cell, { width: columns[5].width }]}>{item.orderCode}</Text>
                                     </TouchableOpacity>
                                 ))
@@ -297,7 +298,7 @@ export default function DeliverySNConfirmBox({ navigation, route }: any) {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={[styles.actionBtn, styles.btnPrimary]}
+                        style={[styles.actionBtn, styles.btnPrimary, { backgroundColor: factoryColor }]}
                         onPress={handleConfirm}
                     >
                         <Text style={styles.btnTextPrimary}>Confirm</Text>

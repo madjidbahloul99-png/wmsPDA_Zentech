@@ -30,8 +30,9 @@ type SNDetail = {
 export default function DeliverySN({ navigation, route }: any) {
   const { deliveryCode, palletCode: initialPalletCode, boxCode: initialBoxCode } = route.params || {};
   const global = useGlobal();
-  const { gsURL } = global;
+  const { gsURL, gs_factoryindex } = global;
   const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
   const [token, setToken] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -68,7 +69,7 @@ export default function DeliverySN({ navigation, route }: any) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, },
         body: JSON.stringify({
-          factoryCode: global.gs_factoryCode,
+          factoryCode: global.gs_factoryCode, gs_factoryindex,
           wareHouseCode: global.gs_wareCode,
           deliveryCode: deliveryCode,
           palletCode: initialPalletCode || "",
@@ -131,7 +132,7 @@ export default function DeliverySN({ navigation, route }: any) {
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: factoryColor }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Image
@@ -149,7 +150,7 @@ export default function DeliverySN({ navigation, route }: any) {
       </View>
 
       <View style={styles.statsCard}>
-        <View style={styles.statBox}>
+        <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
           <Text style={styles.statLabel}>Pallet</Text>
           <TextInput
             style={styles.statInput}
@@ -158,7 +159,7 @@ export default function DeliverySN({ navigation, route }: any) {
             placeholder="-"
           />
         </View>
-        <View style={styles.statBox}>
+        <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
           <Text style={styles.statLabel}>Box Code</Text>
           <TextInput
             style={styles.statInput}
@@ -167,17 +168,17 @@ export default function DeliverySN({ navigation, route }: any) {
             placeholder="-"
           />
         </View>
-        <View style={styles.statBox}>
+        <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
           <Text style={styles.statLabel}>Total Qty</Text>
           <Text style={styles.statValue}>{details.length || "0"}</Text>
         </View>
       </View>
 
       {/* List Card */}
-      <View style={styles.tableCard}>
+      <View style={[styles.tableCard, { borderColor: factoryColor }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={true}>
           <View>
-            <View style={styles.tableHeader}>
+            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
               <Text style={[styles.headerCell, { width: 60 }]}>No</Text>
               <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
               <Text style={[styles.headerCell, { width: 140 }]}>IMEI 1</Text>

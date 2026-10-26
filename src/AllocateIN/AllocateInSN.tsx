@@ -33,8 +33,9 @@ interface PalletSNDetail {
 export default function AllocateInSN({ navigation, route }: any) {
     const { allocateCode, palletCode, boxCode } = route.params || {};
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName ,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,} = global;
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userName ,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,} = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(true);
@@ -161,7 +162,7 @@ export default function AllocateInSN({ navigation, route }: any) {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -180,15 +181,15 @@ export default function AllocateInSN({ navigation, route }: any) {
 
             <View style={styles.content}>
                 <View style={styles.statsCard}>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Pallet</Text>
                         <Text style={styles.statValue}>{palletCode || "-"}</Text>
                     </View>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Box</Text>
                         <Text style={styles.statValue}>{boxCode || "-"}</Text>
                     </View>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Total Qty</Text>
                         <Text style={styles.statValue}>{qtyTotal}</Text>
                     </View>
@@ -196,7 +197,7 @@ export default function AllocateInSN({ navigation, route }: any) {
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                     <View style={{ minWidth: width }}>
-                        <View style={styles.tableHeader}>
+                        <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                             <Text style={[styles.headerCell, { width: 60 }]}>No</Text>
                             <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
                             <Text style={[styles.headerCell, { width: 120 }]}>IMEI1</Text>

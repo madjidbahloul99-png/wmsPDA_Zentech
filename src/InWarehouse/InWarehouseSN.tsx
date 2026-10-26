@@ -32,10 +32,11 @@ interface SNItem {
 export default function InWarehouseSN({ navigation, route }: any) {
     const { palletCode, boxCode } = route.params;
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName, gs_wareType ,
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userName, gs_wareType ,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
     } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(true);
@@ -134,7 +135,7 @@ export default function InWarehouseSN({ navigation, route }: any) {
             <Text style={[styles.cell, { width: 150 }]}>{item.imei3}</Text>
             <View style={{ width: 120 }}>
                 <Text style={styles.cellMain}>{item.model}</Text>
-                <Text style={styles.cellSub}>{item.color}</Text>
+                <Text style={[styles.cellSub, { color: factoryColor }]}>{item.color}</Text>
             </View>
             <Text style={[styles.cell, { width: 120 }]}>{item.date}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.orderCode}</Text>
@@ -144,7 +145,7 @@ export default function InWarehouseSN({ navigation, route }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -162,24 +163,24 @@ export default function InWarehouseSN({ navigation, route }: any) {
 
             <View style={styles.content}>
                 <View style={styles.statsCard}>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Pallet</Text>
                         <Text style={styles.statValue}>{palletCode || "N/A"}</Text>
                     </View>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Box</Text>
                         <Text style={styles.statValue}>{boxCode || "N/A"}</Text>
                     </View>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Total Qty</Text>
                         <Text style={styles.statValue}>{snList.length}</Text>
                     </View>
                 </View>
 
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 50 }]}>No</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>IMEI1</Text>
@@ -192,7 +193,7 @@ export default function InWarehouseSN({ navigation, route }: any) {
                             </View>
                             <ScrollView style={{ flex: 1 }}>
                                 {loading ? (
-                                    <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                    <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                                 ) : (
                                     <FlatList
                                         data={snList}
@@ -206,12 +207,12 @@ export default function InWarehouseSN({ navigation, route }: any) {
                                                 ]}
                                             >
                                                 <Text style={[styles.cell, { width: 50 }]}>{item.fxh}</Text>
-                                                <Text style={[styles.cell, { width: 150, color: "#0052cc" }]}>{item.sn}</Text>
+                                                <Text style={[styles.cell, { width: 150, color: factoryColor }]}>{item.sn}</Text>
                                                 <Text style={[styles.cell, { width: 150 }]}>{item.imei1}</Text>
                                                 <Text style={[styles.cell, { width: 150 }]}>{item.imei2}</Text>
                                                 <Text style={[styles.cell, { width: 150 }]}>{item.imei3}</Text>
                                                 <Text style={[styles.cell, { width: 100 }]}>{item.model}</Text>
-                                                <Text style={[styles.cell, { width: 80 }]}>{item.color}</Text>
+                                                <Text style={[styles.cell, { width: 80, color: factoryColor }]}>{item.color}</Text>
                                                 <Text style={[styles.cell, { width: 200 }]}>{item.date}</Text>
                                                 <Text style={[styles.cell, { width: 120 }]}>{item.orderCode}</Text>
                                             </View>

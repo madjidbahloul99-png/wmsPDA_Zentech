@@ -36,7 +36,7 @@ const menuItems = [
 ];
 
 export default function Menu({ navigation }: any) {
-  const { gsURL, setgs_gsURL, gs_userName, gs_wareCode, gs_wareName } = useGlobal();
+  const { gsURL, setgs_gsURL, gs_userName, gs_wareCode, gs_wareName, gs_factoryindex } = useGlobal();
   const BASE_URL = gsURL;
   const [token, setToken] = useState("");
 
@@ -193,7 +193,7 @@ export default function Menu({ navigation }: any) {
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
       <LinearGradient
-        colors={['#f391f7ff', '#0052cc']}
+        colors={gs_factoryindex === "zentech" ? ['#06b86c', '#048a50'] : ['#f391f7ff', '#0052cc']}
         start={{ x: 1, y: 1 }}
         end={{ x: 1, y: 0}}
         style={styles.headerContainer}

@@ -27,8 +27,9 @@ type BoxDetail = {
 export default function DeliverySNBox({ navigation, route }: any) {
   const { deliveryCode } = route.params || {};
   const global = useGlobal();
-  const { gsURL } = global;
+  const { gsURL, gs_factoryindex } = global;
   const BASE_URL = gsURL;
+  const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
   const [token, setToken] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -143,7 +144,7 @@ export default function DeliverySNBox({ navigation, route }: any) {
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: factoryColor }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Image
@@ -161,17 +162,17 @@ export default function DeliverySNBox({ navigation, route }: any) {
       </View>
 
       <View style={styles.statsCard}>
-        <View style={styles.statBox}>
+        <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
           <Text style={styles.statLabel}>Total Qty</Text>
           <Text style={styles.statValue}>{totalQty || "0"}</Text>
         </View>
       </View>
 
       {/* List Card */}
-      <View style={styles.tableCard}>
+      <View style={[styles.tableCard, { borderColor: factoryColor }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={true}>
           <View style={{ width: totalTableWidth }}>
-            <View style={styles.tableHeader}>
+            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
               {columns.map((col) => (
                 <Text key={col.label} style={[styles.headerCell, { width: col.width }]}>
                   {col.label}
@@ -196,7 +197,7 @@ export default function DeliverySNBox({ navigation, route }: any) {
                     <Text style={[styles.cell, { width: columns[2].width }]}>{item.boxCode}</Text>
                     <Text style={[styles.cell, { width: columns[3].width }]}>{item.qty}</Text>
                     <Text style={[styles.cell, { width: columns[4].width }]}>{item.model}</Text>
-                    <Text style={[styles.cell, { width: columns[5].width }]}>{item.color}</Text>
+                    <Text style={[styles.cell, { width: columns[5].width, color: factoryColor }]}>{item.color}</Text>
                   </TouchableOpacity>
                 ))
               ) : (
@@ -211,7 +212,7 @@ export default function DeliverySNBox({ navigation, route }: any) {
       <View style={styles.footer}>
         <View style={styles.buttonRow}>
           <TouchableOpacity
-            style={[styles.actionBtn, styles.btnPrimary]}
+            style={[styles.actionBtn, styles.btnPrimary, { backgroundColor: factoryColor }]}
             onPress={viewSNDetails}
           >
             <Text style={styles.btnTextPrimary}>Details</Text>

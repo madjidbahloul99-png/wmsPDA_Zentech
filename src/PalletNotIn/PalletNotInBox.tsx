@@ -29,8 +29,9 @@ interface BoxItem {
 export default function PalletNotInBox({ navigation, route }: any) {
     const { palletCode } = route.params || {};
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
 
@@ -129,7 +130,7 @@ export default function PalletNotInBox({ navigation, route }: any) {
                 <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
                 <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
                 <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-                <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+                <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
             </TouchableOpacity>
         );
     };
@@ -137,7 +138,7 @@ export default function PalletNotInBox({ navigation, route }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
                         <Image
@@ -154,21 +155,21 @@ export default function PalletNotInBox({ navigation, route }: any) {
             </View>
 
             <View style={styles.statsCard}>
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Pallet Code</Text>
                     <Text style={styles.statValue}>{palletCode}</Text>
                 </View>
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Total qty</Text>
                     <Text style={styles.statValue}>{totalQty}</Text>
                 </View>
             </View>
 
             <View style={styles.content}>
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 50 }]}>No</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
                                 <Text style={[styles.headerCell, { width: 60 }]}>Qty</Text>
@@ -177,7 +178,7 @@ export default function PalletNotInBox({ navigation, route }: any) {
                             </View>
 
                             {loading ? (
-                                <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                             ) : (
                                 <FlatList
                                     data={boxes}
@@ -258,8 +259,8 @@ const styles = StyleSheet.create({
     cellSub: { fontSize: 10, color: "#64748B", textAlign: "center" },
     footer: { padding: 16, borderTopWidth: 1, borderTopColor: '#e2e8f0' },
     actionBtn: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-    btnPrimary: { backgroundColor: '#0052cc' },
-    btnDisabled: { backgroundColor: '#0052cc' },
+    btnPrimary: { backgroundColor: "#0052cc" },
+    btnDisabled: { backgroundColor: "#0052cc" },
     btnSecondary: { backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#e2e8f0' },
     btnTextPrimary: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     btnTextSecondary: { color: '#475569', fontSize: 15, fontWeight: '700' },

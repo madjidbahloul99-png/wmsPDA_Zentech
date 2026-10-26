@@ -19,9 +19,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function DeliveryReturnSNConfirm({ navigation, route }: any) {
     const { palletCode, sType, currentSn, deliveryCode, systemDeliveryCode, tock, boxCode, showConfirm = true } = route.params;
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName,
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userName,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -127,7 +128,7 @@ export default function DeliveryReturnSNConfirm({ navigation, route }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image source={require("../../assets/logo/left.png")} style={styles.returnLogo} resizeMode="contain" />
@@ -140,29 +141,29 @@ export default function DeliveryReturnSNConfirm({ navigation, route }: any) {
             </View>
 
             <View style={styles.content}>
-                <View style={styles.formCard}>
+                <View style={[styles.formCard, { borderColor: factoryColor }]}>
                     {sType?.toLowerCase() !== 'sn' && (
                         <>
-                            <View style={styles.compactBox}>
+                            <View style={[styles.compactBox, { backgroundColor: factoryColor }]}>
                                 <Text style={styles.infoLabel}>Pallet Code</Text>
                                 <Text style={styles.infoValue}>{palletCode || "N/A"}</Text>
                             </View>
-                            <View style={styles.compactBox}>
+                            <View style={[styles.compactBox, { backgroundColor: factoryColor }]}>
                                 <Text style={styles.infoLabel}>Box Code</Text>
                                 <Text style={styles.infoValue}>{boxCode || "N/A"}</Text>
                             </View>
                         </>
                     )}
-                    <View style={styles.compactBox}>
+                    <View style={[styles.compactBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.infoLabel}>Total Qty</Text>
                         <Text style={styles.infoValue}>{totalQty}</Text>
                     </View>
                 </View>
 
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
                                 <Text style={[styles.headerCell, { width: 120 }]}>IMEI1</Text>
                                 <Text style={[styles.headerCell, { width: 120 }]}>IMEI2</Text>
@@ -172,7 +173,7 @@ export default function DeliveryReturnSNConfirm({ navigation, route }: any) {
                             </View>
                             <ScrollView style={{ flex: 1 }}>
                                 {loading ? (
-                                    <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                    <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                                 ) : snData.length === 0 ? (
                                     <Text style={styles.emptyText}>No data found</Text>
                                 ) : (
@@ -187,7 +188,7 @@ export default function DeliveryReturnSNConfirm({ navigation, route }: any) {
                                             onPress={() => setSelectedItemIndex(index)}
                                             activeOpacity={0.7}
                                         >
-                                            <Text style={[styles.cell, { width: 150, color: "#0052cc" }]}>{item.sn}</Text>
+                                            <Text style={[styles.cell, { width: 150, color: factoryColor }]}>{item.sn}</Text>
                                             <Text style={[styles.cell, { width: 120 }]}>{item.imeiCode1}</Text>
                                             <Text style={[styles.cell, { width: 120 }]}>{item.imeiCode2}</Text>
                                             <Text style={[styles.cell, { width: 120 }]}>{item.imeiCode3}</Text>
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
     emptyText: { textAlign: "center", padding: 40, color: "#94A3B8", fontStyle: "italic", width: 610 },
     actions: { marginTop: 12, gap: 10 },
     actionBtn: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-    btnConfirm: { backgroundColor: '#0052cc' },
+    btnConfirm: { backgroundColor: "#0052cc" },
     btnCancel: { backgroundColor: '#E2E8F0' },
     btnTextPrimary: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     btnTextSecondary: { color: '#475569', fontSize: 15, fontWeight: '700' },

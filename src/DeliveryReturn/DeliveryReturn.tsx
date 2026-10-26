@@ -36,10 +36,11 @@ export default function DeliveryReturn({ navigation, route }: any) {
 
     const { deliveryCode, systemDeliveryCode, tock,totalQty } = route.params;
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_classCode, gs_groupCode, gs_workdate, gs_userCode, gs_userName,
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_classCode, gs_groupCode, gs_workdate, gs_userCode, gs_userName,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
     } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [sn, setSn] = useState("");
@@ -87,7 +88,7 @@ export default function DeliveryReturn({ navigation, route }: any) {
         inputRange: [0, 1],
         outputRange:
             scanState === "waiting"
-                ? ["#0052cc", "#60a5fa"]
+                ? [factoryColor, "#60a5fa"]
                 : scanState === "scanning"
                     ? ["#f59e0b", "#fbbf24"]
                     : scanState === "success"
@@ -523,14 +524,14 @@ export default function DeliveryReturn({ navigation, route }: any) {
             <Text style={[styles.cell, { width: 150 }]}>{item.palletCode}</Text>
             <Text style={[styles.cell, { width: 150 }]}>{item.SN}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-            <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+            <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
             <Text style={[styles.cell, { width: 60 }]}>{item.boxQty}</Text>
         </TouchableOpacity>
     );
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
                         <Image source={require("../../assets/logo/left.png")} style={styles.returnLogo} resizeMode="contain" />
@@ -543,12 +544,12 @@ export default function DeliveryReturn({ navigation, route }: any) {
             </View>
 
             <View style={styles.content}>
-                <View style={styles.formCard}>
-                    <View style={styles.compactBox}>
+                <View style={[styles.formCard, { borderColor: factoryColor }]}>
+                    <View style={[styles.compactBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.infoLabel}>TO</Text>
                         <Text style={styles.infoValue}>{gs_wareCode}</Text>
                     </View>
-                    <View style={styles.compactBox}>
+                    <View style={[styles.compactBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.infoLabel}>QTY</Text>
                         <Text style={styles.infoValue}>{qty}</Text>
                     </View>
@@ -563,7 +564,7 @@ export default function DeliveryReturn({ navigation, route }: any) {
                         ]}>
                             <TextInput
                                 ref={snInputRef}
-                                style={styles.input}
+                                style={[styles.input, { backgroundColor: "#e2f0eeff", borderColor: factoryColor }]}
                                 value={sn}
                                 onChangeText={handleSnChange}
                                 onSubmitEditing={handleSnSubmit}
@@ -583,10 +584,10 @@ export default function DeliveryReturn({ navigation, route }: any) {
                     </View>
                 </View>
 
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Pallet Code</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
@@ -601,7 +602,7 @@ export default function DeliveryReturn({ navigation, route }: any) {
                                 style={{ flex: 1 }}
                                 ListEmptyComponent={() => (
                                     loading ? (
-                                        <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                        <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                                     ) : (
                                         <Text style={styles.emptyText}>Waiting for scanning...</Text>
                                     )
@@ -613,7 +614,7 @@ export default function DeliveryReturn({ navigation, route }: any) {
 
                 <View style={styles.footer}>
                     <TouchableOpacity
-                        style={[styles.actionBtn, styles.btnPrimary]}
+                        style={[styles.actionBtn, styles.btnPrimary, { backgroundColor: factoryColor }]}
                         onPress={() => {
                             navigation.navigate("DeliveryReturnSNBox", { palletCode, deliveryCode });
                         }}
@@ -691,7 +692,7 @@ const styles = StyleSheet.create({
     selectedRow: { backgroundColor: "#ffc3c3ff" },
     footer: { borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 2 },
     actionBtn: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginTop: 12 },
-    btnPrimary: { backgroundColor: '#0052cc' },
+    btnPrimary: { backgroundColor: "#0052cc" },
     btnTextPrimary: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     emptyText: { textAlign: "center", padding: 40, color: "#94A3B8", fontStyle: "italic", width: 400 },
 });

@@ -32,8 +32,9 @@ interface SNDetail {
 export default function AllocateSN({ navigation, route }: any) {
     const { allocateCode, palletCode: initialPalletCode, boxCode: initialBoxCode } = route.params || {};
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -144,7 +145,7 @@ export default function AllocateSN({ navigation, route }: any) {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -165,19 +166,19 @@ export default function AllocateSN({ navigation, route }: any) {
                 <View style={styles.statsCard}>
                     {allocateCode && allocateCode !== "" && (
                         <>
-                            <View style={styles.statBox}>
+                            <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                                 <Text style={styles.statLabel}>Pallet </Text>
                                 <Text style={styles.statValue}>{initialPalletCode}</Text>
                             </View>
 
-                            <View style={styles.statBox}>
+                            <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                                 <Text style={styles.statLabel}>Box</Text>
                                 <Text style={styles.statValue}>{initialBoxCode}</Text>
                             </View>
                         </>
                     )}
 
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Total QTY</Text>
                         <Text style={styles.statValue}>{items.length}</Text>
                     </View>
@@ -190,7 +191,7 @@ export default function AllocateSN({ navigation, route }: any) {
                             keyExtractor={(item) => item.id}
                             renderItem={renderItem}
                             ListHeaderComponent={
-                                <View style={styles.tableHeader}>
+                                <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                     <Text style={[styles.headerCell, { width: 40 }]}>No</Text>
                                     <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
                                     <Text style={[styles.headerCell, { width: 120 }]}>IMEI 1</Text>

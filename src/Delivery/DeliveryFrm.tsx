@@ -29,12 +29,13 @@ type RowType = {
 
 
 export default function DeliveryFrm({ navigation, route }: any) {
-  const { gsURL, setgs_gsURL, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = useGlobal();
+  const { gsURL, setgs_gsURL, gs_factoryindex, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = useGlobal();
   const BASE_URL = gsURL;
   const { deliveryCode } = route.params || { deliveryCode: "" };
   const [token, setToken] = useState("");
 
   const global = useGlobal();
+  const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
   const [barcode, setBarcode] = useState("");
   const [toCkName, setToCkName] = useState("");
   const [totalQty, setTotalQty] = useState("");
@@ -498,7 +499,7 @@ export default function DeliveryFrm({ navigation, route }: any) {
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: factoryColor }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity onPress={() => {
             DeviceEventEmitter.emit("ON_DELIVERY_REFRESH");
@@ -520,7 +521,7 @@ export default function DeliveryFrm({ navigation, route }: any) {
 
       <View style={styles.content}>
         {/* Entry Card */}
-        <View style={styles.card}>
+        <View style={[styles.card, { borderColor: factoryColor }]}>
           <View style={styles.infoRow}>
             <Text style={styles.rightLabel}>From Warehouse</Text>
             <Text style={styles.leftValue}>{toCkName || "--"}</Text>
@@ -535,7 +536,7 @@ export default function DeliveryFrm({ navigation, route }: any) {
             <View style={{
               borderRadius: 10,
               borderWidth: scanState === "waiting" ? 1 : 2,
-              borderColor: scanState === "waiting" ? "#0052cc" : scanState === "scanning" ? "#f59e0b" : scanState === "success" ? "#16a34a" : "#dc2626",
+              borderColor: scanState === "waiting" ? factoryColor : scanState === "scanning" ? "#f59e0b" : scanState === "success" ? "#16a34a" : "#dc2626",
               backgroundColor: "#e2f0eeff",
               elevation: 2,
             }}>
@@ -556,10 +557,10 @@ export default function DeliveryFrm({ navigation, route }: any) {
         </View>
 
         {/* Details Card */}
-        <View style={styles.tableCard}>
+        <View style={[styles.tableCard, { borderColor: factoryColor }]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={true}>
             <View style={{ width: totalTableWidth }}>
-              <View style={styles.tableHeader}>
+              <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                 {columns.map((col) => (
                   <Text key={col.label} style={[styles.headerCell, { width: col.width }]}>
                     {col.label}
@@ -575,7 +576,7 @@ export default function DeliveryFrm({ navigation, route }: any) {
                       <Text style={[styles.cell, { width: columns[1].width }]}>{item.boxCode}</Text>
                       <Text style={[styles.cell, { width: columns[2].width }]}>{item.sn}</Text>
                       <Text style={[styles.cell, { width: columns[3].width }]}>{item.model}</Text>
-                      <Text style={[styles.cell, { width: columns[4].width }]}>{item.color}</Text>
+                      <Text style={[styles.cell, { width: columns[4].width, color: factoryColor }]}>{item.color}</Text>
                       <Text style={[styles.cell, { width: columns[5].width }]}>{item.boxQty}</Text>
                     </View>
                   ))
@@ -590,7 +591,7 @@ export default function DeliveryFrm({ navigation, route }: any) {
         {/* Actions */}
         <View style={styles.footer}>
           <TouchableOpacity
-            style={styles.detailButton}
+            style={[styles.detailButton, { backgroundColor: factoryColor }]}
             onPress={viewDetails}
           >
             <Text style={styles.detailButtonText}> Barcode Details</Text>

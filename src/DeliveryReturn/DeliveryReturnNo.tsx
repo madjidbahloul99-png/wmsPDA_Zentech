@@ -31,10 +31,11 @@ interface DeliveryReturnItem {
 
 export default function DeliveryReturnNo({ navigation }: any) {
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName,
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userName,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
     } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [sn, setSn] = useState("");
@@ -219,7 +220,7 @@ export default function DeliveryReturnNo({ navigation }: any) {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
                         <Image
@@ -238,14 +239,14 @@ export default function DeliveryReturnNo({ navigation }: any) {
             <View style={styles.content}>
                 {loading && (
                     <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.4)', zIndex: 10 }]}>
-                        <ActivityIndicator size="large" color="#0052cc" />
+                        <ActivityIndicator size="large" color={factoryColor} />
                     </View>
                 )}
                 {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
 
                 <TextInput
                     ref={snRef}
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: "#e2f0eeff", borderColor: factoryColor }]}
                     value={sn}
                     onChangeText={handleSnChange}
                     //onSubmitEditing={() => handleSnSubmit()}
@@ -257,10 +258,10 @@ export default function DeliveryReturnNo({ navigation }: any) {
                     onBlur={ensureFocus}
                 />
 
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 140 }]}>BON NO</Text>
                                 <Text style={[styles.headerCell, { width: 200 }]}>Allocate</Text>
                                 <Text style={[styles.headerCell, { width: 120 }]}>Model</Text>
@@ -286,7 +287,7 @@ export default function DeliveryReturnNo({ navigation }: any) {
                 </View>
 
                 <View style={styles.actions}>
-                    <TouchableOpacity style={styles.primaryButton} onPress={handleChoice}>
+                    <TouchableOpacity style={[styles.primaryButton, { backgroundColor: factoryColor }]} onPress={handleChoice}>
                         <Text style={styles.primaryButtonText}>Choice</Text>
                     </TouchableOpacity>
                 </View>
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
     headerCell: { fontSize: 12, fontWeight: "800", color: "#FFFFFF", textAlign: "center", textTransform: "uppercase" },
     emptyText: { textAlign: "center", padding: 40, color: "#94A3B8", fontStyle: "italic" },
     actions: { borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 2 },
-    primaryButton: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0052cc' },
+    primaryButton: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center', backgroundColor: "#0052cc" },
     primaryButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     errorText: { color: "#EF4444", fontSize: 12, marginBottom: 8, fontWeight: "700" },
     selectedRow: { backgroundColor: "#ffc3c3ff" },

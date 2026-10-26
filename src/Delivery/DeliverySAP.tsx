@@ -33,10 +33,11 @@ interface DeliveryItem {
 
 export default function DeliverySAP({ navigation, route }: any) {
   const global = useGlobal();
-  const { gsURL, gs_factoryCode, gs_wareCode, gs_userCode, gs_userName,
+  const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userCode, gs_userName,
     operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
   } = global;
   const BASE_URL = gsURL;
+  const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
   const [token, setToken] = useState("");
 
   const [BonNo, setBonNo] = useState("");
@@ -310,7 +311,7 @@ export default function DeliverySAP({ navigation, route }: any) {
       >
         <Text style={[styles.cell, { color: textColor, width: 120 }]}>{item.bonNo}</Text>
         <Text style={[styles.cell, { color: textColor, width: 120 }]}>{item.model}</Text>
-        <Text style={[styles.cell, { color: textColor, width: 180 }]}>{item.color}</Text>
+        <Text style={[styles.cell, { color: factoryColor, width: 180 }]}>{item.color}</Text>
         <Text style={[styles.cell, { color: textColor, width: 60 }]}>{item.qty}</Text>
         <Text style={[styles.cell, { color: textColor, width: 60 }]}>{item.finishQty}</Text>
         <Text style={[styles.cell, { color: textColor, width: 60 }]}>{item.difference}</Text>
@@ -324,7 +325,7 @@ export default function DeliverySAP({ navigation, route }: any) {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: factoryColor }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
             <Image
@@ -342,13 +343,13 @@ export default function DeliverySAP({ navigation, route }: any) {
       </View>
 
       <View style={styles.content}>
-        <View style={styles.card}>
+        <View style={[styles.card, { borderColor: factoryColor }]}>
           {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
 
           <View style={styles.inputGroup}>
             <TextInput
               ref={bonRef}
-              style={styles.input}
+              style={[styles.input, { backgroundColor: "#e2f0eeff", borderColor: factoryColor }]}
               value={BonNo}
               onChangeText={handleBonChange}
               onSubmitEditing={handleBonSubmit}
@@ -364,7 +365,7 @@ export default function DeliverySAP({ navigation, route }: any) {
           <View style={styles.inputGroup1}>
             <TextInput
               ref={depotRef}
-              style={styles.input1}
+              style={[styles.input1, { backgroundColor: factoryColor, borderColor: factoryColor }]}
               value={depotNo}
               onChangeText={setDepotNo}
               placeholder="DEPOT NO"
@@ -375,10 +376,10 @@ export default function DeliverySAP({ navigation, route }: any) {
 
         </View>
 
-        <View style={styles.tableCard}>
+        <View style={[styles.tableCard, { borderColor: factoryColor }]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={true}>
             <View>
-              <View style={styles.tableHeader}>
+              <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                 <Text style={[styles.headerCell, { width: 120 }]}>BON NO</Text>
                 <Text style={[styles.headerCell, { width: 120 }]}>Model</Text>
                 <Text style={[styles.headerCell, { width: 180 }]}>Color</Text>
@@ -409,13 +410,13 @@ export default function DeliverySAP({ navigation, route }: any) {
         </View>
 
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.detailButton} onPress={handleChoice}>
+          <TouchableOpacity style={[styles.detailButton, { backgroundColor: factoryColor }]} onPress={handleChoice}>
             <Text style={styles.detailButtonText}>Choice</Text>
           </TouchableOpacity>
         </View>
         {loading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#0052cc" />
+            <ActivityIndicator size="large" color={factoryColor} />
           </View>
         )}
       </View>
@@ -476,7 +477,7 @@ const styles = StyleSheet.create({
   cell: { fontSize: 11, color: "#334155", textAlign: "center", fontWeight: "600" },
   emptyText: { textAlign: "center", padding: 40, color: "#94A3B8", fontStyle: "italic", width: 830 },
   footer: { borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 2 },
-  detailButton: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0052cc' },
+  detailButton: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center', backgroundColor: "#0052cc" },
   detailButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
   errorText: { color: "#EF4444", fontSize: 12, marginBottom: 8, fontWeight: "700" },
   selectedRow: { backgroundColor: "#ffc3c3ff" },

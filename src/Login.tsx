@@ -80,6 +80,7 @@ const CustomInput = forwardRef<CustomInputRef, any>(
             showSoftInput = false,
             onBlur,
             icon,
+            inputBorderColor,
         },
         ref
     ) => {
@@ -102,7 +103,7 @@ const CustomInput = forwardRef<CustomInputRef, any>(
             <View style={styles.inputWrapper}>
                 {isSelect ? (
                     <TouchableOpacity
-                        style={[styles.inputContainer, isFocused ? styles.inputFocused : null]}
+                        style={[styles.inputContainer, isFocused ? { borderColor: inputBorderColor === "#06b86c" ? "#06b86c" : "#c744e7ff" } : null]}
                         onPress={() => setShowModal(true)}
                     >
                         {icon && <Image source={icon} style={styles.inputIcon} />}
@@ -113,7 +114,7 @@ const CustomInput = forwardRef<CustomInputRef, any>(
                     </TouchableOpacity>
                 ) : (
                     <View
-                        style={[styles.inputContainer, isFocused ? styles.inputFocused : null]}
+                        style={[styles.inputContainer, isFocused ? { borderColor: inputBorderColor === "#06b86c" ? "#06b86c" : "#c744e7ff" } : null]}
                     >
                         {icon && <Image source={icon} style={styles.inputIcon} />}
                         <TextInput
@@ -203,6 +204,8 @@ export default function Login({ navigation }: any) {
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
         gs_factoryindex,
     } = useGlobal();
+
+    const inputBorderColor = gs_factoryindex === "zentech" ? "#06b86c" : "#e2e8f0";
 
     const [userCode, setUserCode] = useState("");
     const [password, setPassword] = useState("");
@@ -1139,6 +1142,7 @@ export default function Login({ navigation }: any) {
                             label="Classes"
                             placeholder="Select Class"
                             value={selectedClass?.ClassName}
+                            inputBorderColor={inputBorderColor}
                             onChangeText={async (val: any) => {
                                 if (!val) return;
                                 try {
@@ -1182,6 +1186,7 @@ export default function Login({ navigation }: any) {
                             hideText={hideUserCode}
                             onChangeText={handleUserCodeChange}
                             inputRef={userRef}
+                            inputBorderColor={inputBorderColor}
                             //onSubmitEditing={() => checkUserCode()}
                             onFocus={() => setActiveField("user")}
                             onBlur={ensureFocus}
@@ -1192,10 +1197,10 @@ export default function Login({ navigation }: any) {
                             label="Password"
                             placeholder="••••••••"
                             value={password}
-                            onChangeText={setPassword}
                             isPassword
                             inputRef={passwordRef}
                             onSubmitEditing={checkPassword}
+                            inputBorderColor={inputBorderColor}
                             onFocus={() => setActiveField("password")}
                             onBlur={ensureFocus}
                             icon={lockIcon}
@@ -1213,6 +1218,7 @@ export default function Login({ navigation }: any) {
                             isSelect
                             options={warehouseOptions}
                             onSubmitEditing={handleSelectWarehouse}
+                            inputBorderColor={inputBorderColor}
                             onBlur={ensureFocus}
                             icon={warehouseIcon}
                         />

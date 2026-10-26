@@ -35,8 +35,9 @@ interface SNDetail {
 export default function AllocateRejectInSNConfirm({ navigation, route }: any) {
     const { sn, scanType, onConfirm, onCancel, showConfirm, allocateCode: initialAllocateCode } = route.params || {};
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(true);
@@ -183,7 +184,7 @@ export default function AllocateRejectInSNConfirm({ navigation, route }: any) {
             <Text style={[styles.cell, { width: 150 }]}>{item.imei2}</Text>
             <Text style={[styles.cell, { width: 150 }]}>{item.imei3}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-            <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+            <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
             <Text style={[styles.cell, { width: 150 }]}>{item.date}</Text>
             <Text style={[styles.cell, { width: 150 }]}>{item.orderCode}</Text>
         </View>
@@ -192,7 +193,7 @@ export default function AllocateRejectInSNConfirm({ navigation, route }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -209,17 +210,17 @@ export default function AllocateRejectInSNConfirm({ navigation, route }: any) {
             </View>
 
             <View style={styles.statsCard}>
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Pallet</Text>
                     <Text style={styles.statValue}>{palletCode || "-"}</Text>
                 </View>
 
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Box Code</Text>
                     <Text style={styles.statValue}>{boxCode || "-"}</Text>
                 </View>
 
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Total qty</Text>
                     <Text style={styles.statValue}>{details.length}</Text>
                 </View>
@@ -227,11 +228,11 @@ export default function AllocateRejectInSNConfirm({ navigation, route }: any) {
             </View>
 
 
-            <View style={styles.tableCard}>
+            <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                     {loading ? (
                         <View style={{ width: width * 1.5, justifyContent: 'center', alignItems: 'center', paddingTop: 40 }}>
-                            <ActivityIndicator size="large" color="#0052cc" />
+                            <ActivityIndicator size="large" color={factoryColor} />
                         </View>
                     ) : (
                         <FlatList
@@ -239,7 +240,7 @@ export default function AllocateRejectInSNConfirm({ navigation, route }: any) {
                             renderItem={({ item, index }) => renderItem({ item, index })}
                             keyExtractor={(item) => item.id}
                             ListHeaderComponent={
-                                <View style={styles.tableHeader}>
+                                <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                     <Text style={[styles.headerCell, { width: 40 }]}>No</Text>
                                     <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
                                     <Text style={[styles.headerCell, { width: 150 }]}>IMEI1</Text>
@@ -262,7 +263,7 @@ export default function AllocateRejectInSNConfirm({ navigation, route }: any) {
                 <View style={styles.footer}>
                     <View style={styles.buttonRow}>
                         <TouchableOpacity
-                            style={[styles.actionBtn, styles.btnPrimary]}
+                            style={[styles.actionBtn, styles.btnPrimary, { backgroundColor: factoryColor }]}
                             onPress={() => {
                                 if (details.length >= 1) {
                                     Alert.alert(

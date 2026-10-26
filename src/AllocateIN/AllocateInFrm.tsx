@@ -35,6 +35,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
     const {
         gsURL,
         gs_factoryCode,
+        gs_factoryindex,
         gs_wareCode,
         gs_classCode,
         gs_groupCode,
@@ -49,6 +50,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
         operateVersion,
     } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [sn, setSn] = useState("");
@@ -483,7 +485,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
         >
             <Text style={[styles.cell, { width: 120 }]}>{item.boxCode}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-            <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+            <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
             <Text style={[styles.cell, { width: 60 }]}>{item.boxQty}</Text>
         </View>
     );
@@ -496,7 +498,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -514,7 +516,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
             </View>
 
             <View style={styles.content}>
-                <View style={styles.card}>
+                <View style={[styles.card, { borderColor: factoryColor }]}>
                     <View style={{ marginBottom: 8 }}>
                         <View
                             style={[
@@ -577,7 +579,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
                     <View style={styles.inputGroup}>
                         <TextInput
                             ref={snRef}
-                            style={styles.input}
+                            style={[styles.input, { backgroundColor: "#e2f0eeff", borderColor: factoryColor }]}
                             value={sn}
                             onChangeText={handleSnChange}
                             onSubmitEditing={handleSnSubmitInternal}
@@ -594,10 +596,10 @@ export default function AllocateInFrm({ navigation, route }: any) {
                     {errorMsg ? <Text style={styles.errorText}>{errorMsg}</Text> : null}
                 </View>
 
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View style={{ minWidth: width }}>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 120 }]}>
                                     Box Code
                                 </Text>
@@ -624,7 +626,7 @@ export default function AllocateInFrm({ navigation, route }: any) {
 
                 <View style={styles.footer}>
                     <TouchableOpacity
-                        style={styles.detailButton}
+                        style={[styles.detailButton, { backgroundColor: factoryColor }]}
                         onPress={() =>
                             navigation.navigate("AllocateInSNBox", { allocateCode })
                         }

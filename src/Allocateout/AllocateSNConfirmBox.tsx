@@ -35,12 +35,14 @@ const BoxRow = React.memo(({
     item,
     index,
     isSelected,
-    onPress
+    onPress,
+    factoryColor
 }: {
     item: PalletDetail;
     index: number;
     isSelected: boolean;
     onPress: (item: PalletDetail) => void;
+    factoryColor: string;
 }) => (
     <TouchableOpacity
         onPress={() => onPress(item)}
@@ -55,7 +57,7 @@ const BoxRow = React.memo(({
         <Text style={[styles.cell, { width: 100 }]}>{item.boxCode}</Text>
         <Text style={[styles.cell, { width: 50 }]}>{item.qty}</Text>
         <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-        <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+        <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
         <Text style={[styles.cell, { width: 120 }]}>{item.orderCode}</Text>
     </TouchableOpacity>
 ));
@@ -63,8 +65,9 @@ const BoxRow = React.memo(({
 export default function AllocateSNConfirmBox({ navigation, route }: any) {
     const { fromWareHouseCode, barCode, scanType } = route.params || {};
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_userName, gs_wareCode, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_userName, gs_wareCode, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
 
@@ -228,13 +231,14 @@ export default function AllocateSNConfirmBox({ navigation, route }: any) {
             index={index}
             isSelected={selectedItemId === item.id}
             onPress={handleSelectItem}
+            factoryColor={factoryColor}
         />
     ), [selectedItemId, handleSelectItem]);
 
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -251,14 +255,14 @@ export default function AllocateSNConfirmBox({ navigation, route }: any) {
             </View>
 
             <View style={styles.content}>
-                <View style={styles.card}>
+                <View style={[styles.card, { borderColor: factoryColor }]}>
                     <View style={{ marginBottom: 8 }}>
-                        <View style={[styles.input, { backgroundColor: '#0052cc', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 5, marginBottom: 8 }]}>
+                        <View style={[styles.input, { backgroundColor: "#e2f0eeff", borderColor: factoryColor, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 5, marginBottom: 8 }]}>
                             <Text style={[styles.label, { marginBottom: 0, color: "#FFFFFF" }]}>PALLET</Text>
                             <Text style={{ fontSize: 13, color: "#FFFFFF", fontWeight: "700" }}>{palletCode}</Text>
                         </View>
 
-                        <View style={[styles.input, { backgroundColor: '#0052cc', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 5 }]}>
+                        <View style={[styles.input, { backgroundColor: "#e2f0eeff", borderColor: factoryColor, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 5 }]}>
                             <Text style={[styles.label, { marginBottom: 0, color: "#FFFFFF" }]}>TOTAL QTY</Text>
                             <Text style={{ fontSize: 13, color: "#FFFFFF", fontWeight: "700" }}>{totalQty}</Text>
                         </View>
@@ -267,7 +271,7 @@ export default function AllocateSNConfirmBox({ navigation, route }: any) {
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                     <View style={{ width: 530 }}>
-                        <View style={styles.tableHeader}>
+                        <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                             <Text style={[styles.headerCell, { width: 40 }]}>No</Text>
                             <Text style={[styles.headerCell, { width: 100 }]}>Box Code</Text>
                             <Text style={[styles.headerCell, { width: 50 }]}>Qty</Text>
@@ -307,7 +311,7 @@ export default function AllocateSNConfirmBox({ navigation, route }: any) {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={[styles.actionBtn, styles.btnPrimary]}
+                        style={[styles.actionBtn, styles.btnPrimary, { backgroundColor: factoryColor }]}
                         onPress={confirmBatch}
                         activeOpacity={0.8}
                     >
@@ -370,7 +374,7 @@ const styles = StyleSheet.create({
     summaryItem: { alignItems: 'center' },
     summaryLabel: { fontSize: 10, color: '#94a3b8', textTransform: 'uppercase', fontWeight: '800' },
     summaryValue: { fontSize: 18, fontWeight: '800', color: '#1e293b' },
-    tableHeader: { flexDirection: 'row', backgroundColor: '#0052cc', paddingVertical: 10, borderRadius: 8, marginBottom: 4, marginTop: 8 },
+    tableHeader: { flexDirection: 'row', backgroundColor: "#0052cc", paddingVertical: 10, borderRadius: 8, marginBottom: 4, marginTop: 8 },
     headerCell: { color: '#FFFFFF', fontSize: 12, fontWeight: '800', textTransform: 'uppercase', textAlign: 'center' },
     listContent: { paddingBottom: 20, },
     row: { flexDirection: 'row', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', borderRadius: 8, marginBottom: 4, alignItems: 'center' },

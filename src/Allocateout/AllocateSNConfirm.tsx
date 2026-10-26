@@ -35,8 +35,9 @@ interface SNDetail {
 export default function AllocateSNConfirm({ navigation, route }: any) {
   const { fromWareHouseCode, palletCode: initialPalletCode, boxCode: initialBoxCode, SN, scanType, showConfirm } = route.params || {};
   const global = useGlobal();
-  const { gsURL, gs_factoryCode, gs_userName, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
+  const { gsURL, gs_factoryCode, gs_factoryindex, gs_userName, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
   const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
   const [token, setToken] = useState("");
 
   const [loading, setLoading] = useState(false);
@@ -215,7 +216,7 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: factoryColor }]}>
         <View style={styles.headerLeft}>
           <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
             <Image
@@ -233,7 +234,7 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
 
       <View style={styles.content}>
 
-        <View style={styles.card}>
+        <View style={[styles.card, { borderColor: factoryColor }]}>
           <View style={{ marginBottom: 8 }}>
 
             {scanType === "sn" ? (
@@ -371,7 +372,7 @@ export default function AllocateSNConfirm({ navigation, route }: any) {
 
         <ScrollView horizontal showsHorizontalScrollIndicator={true}>
           <View style={{ width: 740 }}>
-            <View style={styles.tableHeader}>
+            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
               <Text style={[styles.headerCell, { width: 40 }]}>No</Text>
               <Text style={[styles.headerCell, { width: 150 }]}>SN</Text>
               <Text style={[styles.headerCell, { width: 120 }]}>IMEI 1</Text>
@@ -462,7 +463,7 @@ const styles = StyleSheet.create({
   summaryRow: { alignItems: 'center', borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: 6 },
   summaryLabel: { fontSize: 10, color: '#94a3b8', textTransform: 'uppercase', fontWeight: '800' },
   summaryValue: { fontSize: 18, fontWeight: '800', color: '#1e293b' },
-  tableHeader: { flexDirection: 'row', backgroundColor: '#0052cc', paddingVertical: 8, borderRadius: 8, marginBottom: 4 },
+  tableHeader: { flexDirection: 'row', backgroundColor: "#0052cc", paddingVertical: 8, borderRadius: 8, marginBottom: 4 },
   headerCell: { color: '#FFFFFF', fontSize: 12, fontWeight: '800', textTransform: 'uppercase', textAlign: 'center' },
   listContent: { paddingBottom: 10 },
   row: { flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', borderRadius: 8, marginBottom: 4, alignItems: 'center' },

@@ -33,8 +33,9 @@ interface PalletBoxDetail {
 export default function AllocateRejectInSNConfirmBox({ navigation, route }: any) {
     const { barCode, scanType, allocateCode: initialAllocateCode } = route.params || {};
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(true);
@@ -175,7 +176,7 @@ export default function AllocateRejectInSNConfirmBox({ navigation, route }: any)
             <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
             <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-            <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+            <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.orderCode}</Text>
         </TouchableOpacity>
     );
@@ -183,7 +184,7 @@ export default function AllocateRejectInSNConfirmBox({ navigation, route }: any)
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -200,12 +201,12 @@ export default function AllocateRejectInSNConfirmBox({ navigation, route }: any)
             </View>
 
             <View style={styles.statsCard}>
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Total Qty</Text>
                     <Text style={styles.statValue}>{qtyTotal || "0"}</Text>
                 </View>
                 {palletCode ? (
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Pallet</Text>
                         <Text style={styles.statValue}>{palletCode}</Text>
                     </View>
@@ -218,10 +219,10 @@ export default function AllocateRejectInSNConfirmBox({ navigation, route }: any)
                 ) : null}
             </View>
 
-            <View style={styles.tableCard}>
+            <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                     <View>
-                        <View style={styles.tableHeader}>
+                        <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                             <Text style={[styles.headerCell, { width: 50 }]}>No</Text>
                             <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
                             <Text style={[styles.headerCell, { width: 60 }]}>Qty</Text>
@@ -231,7 +232,7 @@ export default function AllocateRejectInSNConfirmBox({ navigation, route }: any)
                         </View>
 
                         {loading ? (
-                            <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                            <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                         ) : (
                             <FlatList
                                 data={details}
@@ -267,7 +268,7 @@ export default function AllocateRejectInSNConfirmBox({ navigation, route }: any)
                         <Text style={styles.btnTextSecondary}>Barcode Details</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.actionBtn, styles.btnPrimary]}
+                        style={[styles.actionBtn, styles.btnPrimary, { backgroundColor: factoryColor }]}
                         onPress={() => {
                             if (details.length >= 1) {
                                 Alert.alert(

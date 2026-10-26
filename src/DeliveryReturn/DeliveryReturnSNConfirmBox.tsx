@@ -19,8 +19,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function DeliveryReturnSNConfirmBox({ navigation, route }: any) {
     const { palletCode, sType, currentSn, deliveryCode, systemDeliveryCode, tock } = route.params;
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userName, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -134,7 +135,7 @@ export default function DeliveryReturnSNConfirmBox({ navigation, route }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image source={require("../../assets/logo/left.png")} style={styles.returnLogo} resizeMode="contain" />
@@ -147,7 +148,7 @@ export default function DeliveryReturnSNConfirmBox({ navigation, route }: any) {
             </View>
 
             <View style={styles.content}>
-                <View style={styles.formCard}>
+                <View style={[styles.formCard, { borderColor: factoryColor }]}>
                     <View style={styles.infoBox}>
                         <Text style={styles.infoLabel}>Pallet Code</Text>
                         <Text style={styles.infoValue}>{palletCode}</Text>
@@ -158,10 +159,10 @@ export default function DeliveryReturnSNConfirmBox({ navigation, route }: any) {
                     </View>
                 </View>
 
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
                                 <Text style={[styles.headerCell, { width: 120 }]}>Model</Text>
                                 <Text style={[styles.headerCell, { width: 100 }]}>Color</Text>
@@ -170,7 +171,7 @@ export default function DeliveryReturnSNConfirmBox({ navigation, route }: any) {
                             </View>
                             <ScrollView style={{ flex: 1 }}>
                                 {loading ? (
-                                    <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                    <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                                 ) : palletData.length === 0 ? (
                                     <Text style={styles.emptyText}>No data found</Text>
                                 ) : (
@@ -187,7 +188,7 @@ export default function DeliveryReturnSNConfirmBox({ navigation, route }: any) {
                                         >
                                             <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
                                             <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-                                            <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+                                            <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
                                             <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
                                             <Text style={[styles.cell, { width: 120 }]}>{item.orderCode}</Text>
                                         </TouchableOpacity>
@@ -268,8 +269,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    btnConfirm: { backgroundColor: '#0052cc' },
-    btnDetail: { backgroundColor: '#F1F5F9', borderWidth: 1, borderColor: '#0052cc' },
+    btnConfirm: { backgroundColor: "#0052cc" },
+    btnDetail: { backgroundColor: '#F1F5F9', borderWidth: 1, borderColor: "#0052cc" },
     btnTextPrimary: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     btnTextDetail: { color: '#0052cc', fontSize: 15, fontWeight: '700' },
 });

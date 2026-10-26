@@ -33,8 +33,9 @@ interface PalletDetail {
 export default function AllocateInSNConfirmBox({ navigation, route }: any) {
     const { allocateCode, barCode, scanType, onConfirm } = route.params || {};
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_userName,operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(true);
@@ -161,7 +162,7 @@ export default function AllocateInSNConfirmBox({ navigation, route }: any) {
                 <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
                 <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
                 <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-                <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+                <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
                 <Text style={[styles.cell, { width: 150 }]}>{item.orderCode}</Text>
             </TouchableOpacity>
         );
@@ -191,7 +192,7 @@ export default function AllocateInSNConfirmBox({ navigation, route }: any) {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -210,11 +211,11 @@ export default function AllocateInSNConfirmBox({ navigation, route }: any) {
 
             <View style={styles.content}>
                 <View style={styles.statsCard}>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Pallet</Text>
                         <Text style={styles.statValue}>{palletCode || "-"}</Text>
                     </View>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Total Qty</Text>
                         <Text style={styles.statValue}>{totalQty}</Text>
                     </View>
@@ -222,7 +223,7 @@ export default function AllocateInSNConfirmBox({ navigation, route }: any) {
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                     <View>
-                        <View style={styles.tableHeader}>
+                        <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                             <Text style={[styles.headerCell, { width: 60 }]}>No</Text>
                             <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
                             <Text style={[styles.headerCell, { width: 60 }]}>Qty</Text>
@@ -245,10 +246,10 @@ export default function AllocateInSNConfirmBox({ navigation, route }: any) {
                 </ScrollView>
 
                 <View style={styles.actions}>
-                    <TouchableOpacity style={styles.detailButton} onPress={handleBarcodeDetails}>
+                    <TouchableOpacity style={[styles.detailButton, { backgroundColor: factoryColor }]} onPress={handleBarcodeDetails}>
                         <Text style={styles.detailButtonText}>Barcode Details</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+                    <TouchableOpacity style={[styles.confirmButton, { backgroundColor: factoryColor }]} onPress={handleConfirm}>
                         <Text style={styles.confirmButtonText}>Confirm</Text>
                     </TouchableOpacity>
                 </View>

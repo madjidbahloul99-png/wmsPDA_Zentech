@@ -29,10 +29,11 @@ interface BoxItem {
 export default function InWarehouseSNBox({ navigation, route }: any) {
     const { palletCode } = route.params;
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName, gs_wareType,
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userName, gs_wareType,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
      } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [loading, setLoading] = useState(true);
@@ -145,7 +146,7 @@ export default function InWarehouseSNBox({ navigation, route }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -163,20 +164,20 @@ export default function InWarehouseSNBox({ navigation, route }: any) {
 
             <View style={styles.content}>
                 <View style={styles.statsCard}>
-                    <View style={styles.statBox}>
+                    <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Total Qty</Text>
                         <Text style={styles.statValue}>{totalQty}</Text>
                     </View>
-                       <View style={styles.statBox}>
+                       <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                         <Text style={styles.statLabel}>Pallet Code</Text>
                         <Text style={styles.statValue}>{palletCode}</Text>
                     </View>
                 </View>
 
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 50 }]}>No</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
                                 <Text style={[styles.headerCell, { width: 60 }]}>Qty</Text>
@@ -186,7 +187,7 @@ export default function InWarehouseSNBox({ navigation, route }: any) {
                             </View>
                             <ScrollView style={{ flex: 1 }}>
                                 {loading ? (
-                                    <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                    <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                                 ) : (
                                     <FlatList
                                         data={boxList}
@@ -201,10 +202,10 @@ export default function InWarehouseSNBox({ navigation, route }: any) {
                                                 activeOpacity={0.7}
                                             >
                                                 <Text style={[styles.cell, { width: 50, }]}>{item.fxh}</Text>
-                                                <Text style={[styles.cell, { width: 150, color: "#0052cc" }]}>{item.boxCode}</Text>
+                                                <Text style={[styles.cell, { width: 150, color: factoryColor }]}>{item.boxCode}</Text>
                                                 <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
                                                 <Text style={[styles.cell, { width: 100 }]}>{item.model}</Text>
-                                                <Text style={[styles.cell, { width: 80 }]}>{item.color}</Text>
+                                                <Text style={[styles.cell, { width: 80, color: factoryColor }]}>{item.color}</Text>
                                                 <Text style={[styles.cell, { width: 120 }]}>{item.orderCode}</Text>
                                             </TouchableOpacity>
                                         )}
@@ -221,7 +222,7 @@ export default function InWarehouseSNBox({ navigation, route }: any) {
                 </View>
 
                 <View style={styles.footer}>
-                    <TouchableOpacity style={[styles.actionBtn, styles.btnPrimary]} onPress={handleDetails}>
+                    <TouchableOpacity style={[styles.actionBtn, styles.btnPrimary, { backgroundColor: factoryColor }]} onPress={handleDetails}>
                         <Text style={styles.btnTextPrimary}>Details</Text>
                     </TouchableOpacity>
                 </View>
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
     cellSub: { fontSize: 10, color: "#64748B", textAlign: "center" },
     footer: { borderTopWidth: 1, borderTopColor: '#e2e8f0', paddingTop: 16 },
     actionBtn: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-    btnPrimary: { backgroundColor: '#0052cc' },
+    btnPrimary: { backgroundColor: "#0052cc" },
     btnTextPrimary: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
     emptyText: { textAlign: "center", padding: 40, color: "#94A3B8", fontStyle: "italic", width: 400 },
 });

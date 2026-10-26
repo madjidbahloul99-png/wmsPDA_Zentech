@@ -51,6 +51,7 @@ export default function AllocateFrm({ navigation, route }: any) {
     const {
         gsURL,
         gs_factoryCode,
+        gs_factoryindex,
         gs_wareCode,
         gs_wareType,
         gs_classCode,
@@ -66,6 +67,7 @@ export default function AllocateFrm({ navigation, route }: any) {
         operateVersion,
     } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [barcode, setBarcode] = useState("");
@@ -604,7 +606,7 @@ export default function AllocateFrm({ navigation, route }: any) {
                 <Text style={[styles.cell, { width: columns[3].width }]}>
                     {item.model}
                 </Text>
-                <Text style={[styles.cell, { width: columns[4].width }]}>
+                <Text style={[styles.cell, { width: columns[4].width, color: factoryColor }]}>
                     {item.color}
                 </Text>
                 <Text style={[styles.cell, { width: columns[5].width }]}>
@@ -622,7 +624,7 @@ export default function AllocateFrm({ navigation, route }: any) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -639,7 +641,7 @@ export default function AllocateFrm({ navigation, route }: any) {
             </View>
 
             <View style={styles.container}>
-                <View style={styles.card}>
+                <View style={[styles.card, { borderColor: factoryColor }]}>
                     <View style={styles.mb8}>
                         <View style={styles.inputRow}>
                             <Text style={styles.labelNoMargin}>TO WH</Text>
@@ -659,7 +661,7 @@ export default function AllocateFrm({ navigation, route }: any) {
                                 borderWidth: scanState === "waiting" ? 1 : 2,
                                 borderColor:
                                     scanState === "waiting"
-                                        ? "#0052cc"
+                                        ? factoryColor
                                         : scanState === "scanning"
                                             ? "#f59e0b"
                                             : scanState === "success"
@@ -691,10 +693,10 @@ export default function AllocateFrm({ navigation, route }: any) {
                     </View>
                 </View>
 
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View style={{ width: totalTableWidth }}>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 {columns.map((col) => (
                                     <Text
                                         key={col.label}
@@ -727,7 +729,7 @@ export default function AllocateFrm({ navigation, route }: any) {
                 </View>
 
                 <View style={styles.actions}>
-                    <TouchableOpacity style={styles.actionButton} onPress={viewDetails}>
+                    <TouchableOpacity style={[styles.actionButton, { backgroundColor: factoryColor }]} onPress={viewDetails}>
                         <Text style={styles.actionButtonText}>Barcode Details</Text>
                     </TouchableOpacity>
                 </View>

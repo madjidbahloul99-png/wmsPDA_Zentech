@@ -30,10 +30,11 @@ interface PalletBoxItem {
 
 export default function PalletSearch({ navigation }: any) {
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_userName ,
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_userName ,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
     } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [sn, setSn] = useState("");
@@ -231,7 +232,7 @@ export default function PalletSearch({ navigation }: any) {
                 <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
                 <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
                 <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-                <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+                <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
                 <Text style={[styles.cell, { width: 120 }]}>{item.orderCode}</Text>
             </TouchableOpacity>
         );
@@ -240,7 +241,7 @@ export default function PalletSearch({ navigation }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
                         <Image
@@ -257,7 +258,7 @@ export default function PalletSearch({ navigation }: any) {
             </View>
 
             <View style={styles.statsCard}>
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Total Qty</Text>
                     <Text style={styles.statValue}>{totalQty}</Text>
                 </View>
@@ -266,7 +267,7 @@ export default function PalletSearch({ navigation }: any) {
             <View style={styles.inputContainer}>
                 <TextInput
                     ref={snInputRef}
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: "#e2f0eeff", borderColor: factoryColor }]}
                     value={sn}
                     onChangeText={handleBarcodeChange}
                     placeholder="Pallet/Box"
@@ -280,10 +281,10 @@ export default function PalletSearch({ navigation }: any) {
                 />
             </View>
 
-            <View style={styles.tableCard}>
+            <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                     <View>
-                        <View style={styles.tableHeader}>
+                        <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                             <Text style={[styles.headerCell, { width: 50 }]}>No</Text>
                             <Text style={[styles.headerCell, { width: 150 }]}>Pallet Code</Text>
                             <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
@@ -294,7 +295,7 @@ export default function PalletSearch({ navigation }: any) {
                         </View>
 
                         {loading && boxList.length === 0 ? (
-                            <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                            <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                         ) : (
                             <FlatList
                                 data={boxList}
@@ -388,7 +389,7 @@ const styles = StyleSheet.create({
     emptyStateText: { color: "#94A3B8", fontSize: 14, fontWeight: "500" },
     footer: { padding: 16, borderTopWidth: 1, borderTopColor: '#e2e8f0', marginBottom: -4 },
     actionBtn: { height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-    btnPrimary: { backgroundColor: '#0052cc' },
+    btnPrimary: { backgroundColor: "#0052cc" },
     btnDisabled: { backgroundColor: '#004bccff' },
     btnTextPrimary: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
 });

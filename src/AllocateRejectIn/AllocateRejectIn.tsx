@@ -33,10 +33,11 @@ interface BoxItem {
 
 export default function AllocateRejectIn({ navigation }: any) {
     const global = useGlobal();
-    const { gsURL, gs_factoryCode, gs_wareCode, gs_classCode, gs_groupCode, gs_workdate, gs_userCode, gs_userName ,
+    const { gsURL, gs_factoryCode, gs_factoryindex, gs_wareCode, gs_classCode, gs_groupCode, gs_workdate, gs_userCode, gs_userName ,
         operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
     } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
     const [token, setToken] = useState("");
 
     const [sn, setSn] = useState("");
@@ -319,7 +320,7 @@ export default function AllocateRejectIn({ navigation }: any) {
         >
             <Text style={[styles.cell, { width: 150 }]}>{item.boxCode}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-            <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+            <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
             <Text style={[styles.cell, { width: 60 }]}>{item.boxQty}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.systemAllocateCode}</Text>
             <Text style={[styles.cell, { width: 120 }]}>{item.allocateCode}</Text>
@@ -329,7 +330,7 @@ export default function AllocateRejectIn({ navigation }: any) {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
                         <Image
@@ -345,19 +346,19 @@ export default function AllocateRejectIn({ navigation }: any) {
                 </View>
             </View>
 
-            <View style={styles.card}>
-                <View style={styles.statRow}>
+            <View style={[styles.card, { borderColor: factoryColor }]}>
+                <View style={[styles.statRow, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Bill NO</Text>
                     <Text style={styles.statValue}>{sysBill || "-"}</Text>
                 </View>
-                <View style={styles.statRow}>
+                <View style={[styles.statRow, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Total Qty</Text>
                     <Text style={styles.statValue}>{qty || "0"}</Text>
                 </View>
                 <View style={{
                     borderRadius: 10,
                     borderWidth: scanState === "waiting" ? 1 : 2,
-                    borderColor: scanState === "waiting" ? "#0052cc" : scanState === "scanning" ? "#f59e0b" : scanState === "success" ? "#16a34a" : "#dc2626",
+                    borderColor: scanState === "waiting" ? factoryColor : scanState === "scanning" ? "#f59e0b" : scanState === "success" ? "#16a34a" : "#dc2626",
                     backgroundColor: "#e2f0eeff",
                     elevation: 2,
                 }}>
@@ -378,10 +379,10 @@ export default function AllocateRejectIn({ navigation }: any) {
                 </View>
             </View>
 
-            <View style={styles.tableCard}>
+            <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                     <View>
-                        <View style={styles.tableHeader}>
+                        <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                             <Text style={[styles.headerCell, { width: 150 }]}>Box Code</Text>
                             <Text style={[styles.headerCell, { width: 120 }]}>Model</Text>
                             <Text style={[styles.headerCell, { width: 100 }]}>Color</Text>
@@ -397,7 +398,7 @@ export default function AllocateRejectIn({ navigation }: any) {
                             contentContainerStyle={styles.listContent}
                             ListEmptyComponent={() => (
                                 loading ? (
-                                    <ActivityIndicator size="large" color="#0052cc" style={{ marginTop: 40 }} />
+                                    <ActivityIndicator size="large" color={factoryColor} style={{ marginTop: 40 }} />
                                 ) : (
                                     <View style={styles.emptyContainer}>
                                         <Text style={styles.emptyText}>Waiting for scanning...</Text>
@@ -413,7 +414,7 @@ export default function AllocateRejectIn({ navigation }: any) {
             <View style={styles.footer}>
                 <View style={styles.buttonRow}>
                     <TouchableOpacity
-                        style={[styles.actionBtn, styles.btnPrimary]}
+                        style={[styles.actionBtn, styles.btnPrimary, { backgroundColor: factoryColor }]}
                         onPress={() => {
                             if (allocateCode) {
                                 navigation.navigate("AllocateInSNBox", {
@@ -480,7 +481,7 @@ const styles = StyleSheet.create({
     footer: { padding: 16 },
     buttonRow: { flexDirection: 'row', gap: 12 },
     actionBtn: { flex: 1, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-    btnPrimary: { backgroundColor: '#0052cc' },
+    btnPrimary: { backgroundColor: "#0052cc" },
     btnTextPrimary: { color: '#fff', fontSize: 15, fontWeight: '800' },
     emptyContainer: { padding: 40, alignItems: 'center' },
     emptyText: { color: '#94a3b8', fontWeight: '600', fontSize: 14, fontStyle: "italic" },

@@ -32,9 +32,10 @@ interface PalletRowProps {
     index: number;
     isSelected: boolean;
     onPress: (index: number) => void;
+    factoryColor: string;
 }
 
-const PalletRow = React.memo(({ item, index, isSelected, onPress }: PalletRowProps) => (
+const PalletRow = React.memo(({ item, index, isSelected, onPress, factoryColor }: PalletRowProps) => (
     <TouchableOpacity
         style={[
             styles.tableRow,
@@ -48,7 +49,7 @@ const PalletRow = React.memo(({ item, index, isSelected, onPress }: PalletRowPro
         <Text style={[styles.cell, { width: 150 }]}>{item.palletCode}</Text>
         <Text style={[styles.cell, { width: 60 }]}>{item.qty}</Text>
         <Text style={[styles.cell, { width: 120 }]}>{item.model}</Text>
-        <Text style={[styles.cell, { width: 100 }]}>{item.color}</Text>
+        <Text style={[styles.cell, { width: 100, color: factoryColor }]}>{item.color}</Text>
     </TouchableOpacity>
 ));
 // ─────────────────────────────────────────────────────────────────────────────
@@ -58,6 +59,7 @@ export default function PalletNotIn({ navigation }: any) {
     const {
         gsURL,
         gs_factoryCode,
+        gs_factoryindex,
         gs_userName,
         operateUserCode,
         operateUserName,
@@ -67,6 +69,7 @@ export default function PalletNotIn({ navigation }: any) {
         operateVersion,
     } = global;
     const BASE_URL = gsURL;
+    const factoryColor = gs_factoryindex === "zentech" ? "#06b86c" : "#0052cc";
 
     const [token, setToken] = useState("");
     const [loading, setLoading] = useState(true);
@@ -178,6 +181,7 @@ export default function PalletNotIn({ navigation }: any) {
                 index={index}
                 isSelected={selectedItemIndex === index}
                 onPress={handleSelectItem}
+                factoryColor={factoryColor}
             />
         ),
         [selectedItemIndex, handleSelectItem]
@@ -200,7 +204,7 @@ export default function PalletNotIn({ navigation }: any) {
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
             {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: factoryColor }]}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={0.7}>
                         <Image
@@ -218,11 +222,11 @@ export default function PalletNotIn({ navigation }: any) {
 
             {/* Stats */}
             <View style={styles.statsCard}>
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Total QTY</Text>
                     <Text style={styles.statValue}>{filteredTotalQty}</Text>
                 </View>
-                <View style={styles.statBox}>
+                <View style={[styles.statBox, { backgroundColor: factoryColor }]}>
                     <Text style={styles.statLabel}>Total Pallets</Text>
                     <Text style={styles.statValue}>{filteredPalletCount}</Text>
                 </View>
@@ -242,10 +246,10 @@ export default function PalletNotIn({ navigation }: any) {
 
             {/* Table */}
             <View style={styles.content}>
-                <View style={styles.tableCard}>
+                <View style={[styles.tableCard, { borderColor: factoryColor }]}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={true}>
                         <View>
-                            <View style={styles.tableHeader}>
+                            <View style={[styles.tableHeader, { backgroundColor: factoryColor }]}>
                                 <Text style={[styles.headerCell, { width: 50 }]}>No</Text>
                                 <Text style={[styles.headerCell, { width: 150 }]}>Pallet Code</Text>
                                 <Text style={[styles.headerCell, { width: 60 }]}>Qty</Text>
@@ -256,7 +260,7 @@ export default function PalletNotIn({ navigation }: any) {
                             {loading ? (
                                 <ActivityIndicator
                                     size="large"
-                                    color="#0052cc"
+                                    color={factoryColor}
                                     style={{ marginTop: 40 }}
                                 />
                             ) : (
