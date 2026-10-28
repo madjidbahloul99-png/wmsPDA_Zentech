@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Mobile\nWmsPDA</string>
+    <!-- <string name="app_name">mobile\nWmsPDA</string> -->
+    <string name="app_name">Zentech\nWmsPDA</string>
+    
 </resources>

@@ -79,7 +79,7 @@ android {
 
     namespace "com.myproject"
     defaultConfig {
-        applicationId "com.myproject.mobilewms"
+        applicationId "com.myproject.zentechwms"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

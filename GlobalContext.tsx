@@ -88,8 +88,8 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
 
 //change gsURL according to the environment you want to use, "https://zwmsapi.condor.dz" or "https://mespdamobile.condor.dz/WMSPDANEW" or "http://
 
- //const [gsURL, _setgsgsURL] = useState("https://zwmsapi.condor.dz"); 
-const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW");   
+ const [gsURL, _setgsgsURL] = useState("https://zwmsapi.condor.dz"); 
+   //const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW");   
   //const [gsURL, _setgsgsURL] = useState("http://192.168.100.24:7278"); 
 
   // BaseSignInfo
@@ -104,8 +104,8 @@ const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW"
   //change gs_factoryindex according to the factory you want to use, "zentech" or "mobile"
   
   const [gs_factoryCode, _setFactoryCode] = useState("001");
-  //const [gs_factoryindex, _setFactoryindex] = useState("zentech");
-  const [gs_factoryindex, _setFactoryindex] = useState("mobile");
+  const [gs_factoryindex, _setFactoryindex] = useState("zentech");
+  //const [gs_factoryindex, _setFactoryindex] = useState("mobile");
 
   // Warehouse
   const [gs_wareCode, _setWareCode] = useState("");
