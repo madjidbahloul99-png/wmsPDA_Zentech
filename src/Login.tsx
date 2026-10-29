@@ -319,7 +319,9 @@ export default function Login({ navigation }: any) {
         const finalURL = url || gsURL;
 
         try {
-            const res = await fetch(`${finalURL}/api/update/latest`);
+          
+           // const res = await fetch(`${finalURL}/api/update/latest`);
+            const res = await fetch(`${finalURL}/api/updateZentech/latest`);
             const json = await res.json();
 
             console.log("UPDATE API:", json);
