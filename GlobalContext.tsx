@@ -98,7 +98,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [operateWareHouseCode, _setOperateWareHouseCode] = useState("");
   const [operateRandomNumber, _setOperateRandomNumber] = useState("");
   const [operateSign, _setOperateSign] = useState("");
-  const [operateVersion, _setOperateVersion] = useState("1.0.2");
+  const [operateVersion, _setOperateVersion] = useState("1.0.0");
 
   // Factory
   //change gs_factoryindex according to the factory you want to use, "zentech" or "mobile"
