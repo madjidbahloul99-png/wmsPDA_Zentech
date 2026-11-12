@@ -119,13 +119,18 @@ export default function ChangePassword({ navigation, route }: any) {
         return;
       }
 
-      Alert.alert(
-        'Success',
-        forced
-          ? `${data.data.message}\nPlease login with the new password.`
-          : data.data.message,
-        [{ text: 'OK', onPress: () => navigation.goBack() }],
-      );
+      if (forced) {
+        // first login (123) or password older than 90 days:
+        // success -> go directly to the Login page, without any alert
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
+      } else {
+        Alert.alert('Success', data.data.message, [
+          { text: 'OK', onPress: () => navigation.goBack() },
+        ]);
+      }
     } catch (error) {
       setErrorText('Server not reachable');
     } finally {

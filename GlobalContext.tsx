@@ -90,7 +90,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
 
  const [gsURL, _setgsgsURL] = useState("https://zwmsapi.condor.dz"); 
    //const [gsURL, _setgsgsURL] = useState("https://mespdamobile.condor.dz/WMSPDANEW");   
-  //const [gsURL, _setgsgsURL] = useState("http://192.168.100.24:7278"); 
+  //const [gsURL, _setgsgsURL] = useState("http://192.168.100.32:5038"); 
 
   // BaseSignInfo
   const [operateUserCode, _setOperateUserCode] = useState("");
@@ -98,7 +98,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [operateWareHouseCode, _setOperateWareHouseCode] = useState("");
   const [operateRandomNumber, _setOperateRandomNumber] = useState("");
   const [operateSign, _setOperateSign] = useState("");
-  const [operateVersion, _setOperateVersion] = useState("1.0.0");
+  const [operateVersion, _setOperateVersion] = useState("1.0.2");
 
   // Factory
   //change gs_factoryindex according to the factory you want to use, "zentech" or "mobile"

@@ -157,11 +157,9 @@ const CustomInput = forwardRef<CustomInputRef, any>(
               // <TouchableOpacity onPress={() => setShowPassword(showPassword)}>
               //     <Image source={eyeCrossedIcon} style={styles.eyeIcon} />
               // </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Image
-                  source={showPassword ? eyeIcon : eyeCrossedIcon}
-                  style={styles.eyeIcon}
-                />
+              // Eye always disabled: password stays hidden, no toggle
+              <TouchableOpacity disabled activeOpacity={1}>
+                <Image source={eyeCrossedIcon} style={styles.eyeIcon} />
               </TouchableOpacity>
             )}
           </View>
@@ -320,21 +318,16 @@ export default function Login({ navigation }: any) {
 
       if (r.isok === '9') {
         // first login (123) or password older than 90 days -> change password page
+        // (directly open the change password form, no confirmation message)
         setPassword('');
         passwordRef.current?.setNativeProps({ text: '' });
-        Alert.alert('Change password', r.message, [
-          {
-            text: 'OK',
-            onPress: () =>
-              navigation.navigate('ChangePassword', {
-                userCode: u,
-                userName: r.userName,
-                reason: r.reason,
-                forced: true,
-                message: r.message,
-              }),
-          },
-        ]);
+        navigation.navigate('ChangePassword', {
+          userCode: u,
+          userName: r.userName,
+          reason: r.reason,
+          forced: true,
+          message: r.message,
+        });
         return false;
       }
 
@@ -1248,6 +1241,14 @@ export default function Login({ navigation }: any) {
               inputBorderColor={inputBorderColor}
               onChangeText={async (val: any) => {
                 if (!val) return;
+
+                // After choosing the shift, the soft keyboard must not appear:
+                // if it opens, close it right away (focus goes back to User Code via onBlur)
+                const kbSub = Keyboard.addListener('keyboardDidShow', () => {
+                  Keyboard.dismiss();
+                });
+                setTimeout(() => kbSub.remove(), 2500);
+
                 try {
                   const resCheckTime = await fetch(
                     `${gsURL}/api/CheckClassesTime`,
