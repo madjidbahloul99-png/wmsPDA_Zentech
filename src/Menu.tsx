@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,50 +9,157 @@ import {
   Dimensions,
   Alert,
   Image,
-} from "react-native";
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
-import { useGlobal } from "../GlobalContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-const { width } = Dimensions.get("window");
+import { useGlobal } from '../GlobalContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const { width } = Dimensions.get('window');
 
 const menuItems = [
-  { title: "Warehousing\nScanning", icon: require("../assets/logomenu/Inwarehouse.png"), screen: "InWarehouse", fcode: "button_in", disabled: false },
-  { title: "Allocate Into\nWarehouse", icon: require("../assets/logomenu/AllocateIn.png"), screen: "AllocateInNO", fcode: "button_DBIn", disabled: false },
-  { title: "Allocate Out", icon: require("../assets/logomenu/Allocateout.png"), screen: "AllocateSAP", fcode: "button_DBOutSAP", disabled: false },
-  { title: "Delivery", icon: require("../assets/logomenu/Delivery.png"), screen: "DeliverySAP", fcode: "button_fahuoSAP", disabled: false },
-  { title: "Allocate Return\nInto WH", icon: require("../assets/logomenu/reject.png"), screen: "AllocateRejectIn", fcode: "btnAllocateRejectIn", disabled: false },
-  { title: "Delivery\nReturn", icon: require("../assets/logomenu/DeliveryReturn.png"), screen: "DeliveryReturnNo", fcode: "btnDeliveryReturn", disabled: false },
-  { title: "Inventory\nVerification", icon: require("../assets/logomenu/inventory1.png"), screen: "PD", fcode: "button_pd", disabled: false },
-  { title: "Pallet\nSearch", icon: require("../assets/logomenu/searchpallet.png"), screen: "PalletSearch", fcode: "button_pallerCx", disabled: false },
-  { title: "Not In\nWare", icon: require("../assets/logomenu/Notinware.png"), screen: "PalletNotIn", fcode: "btnNotIn", disabled: false },
-  { title: "Box/Pallet\nAssembly", icon: require("../assets/logomenu/Assembly.png"), screen: "Assembly", fcode: "button_boxZu", disabled: false },
-  { title: "Box/Pallet\nDisassembly", icon: require("../assets/logomenu/Disassembly.png"), screen: "Disassembly", fcode: "button_boxChai", disabled: false },
-  { title: "SN\nReturn", icon: require("../assets/logomenu/SNReturn.png"), screen: "SNReturn", fcode: "btnReturnSN", disabled: true },
-  { title: "Distributor\nReturn", icon: require("../assets/logomenu/DistributorReturn.png"), screen: "DistributorReturnNo", fcode: "btnDistributeReturn", disabled: true },
+  {
+    title: 'Warehousing\nScanning',
+    icon: require('../assets/logomenu/Inwarehouse.png'),
+    screen: 'InWarehouse',
+    fcode: 'button_in',
+    disabled: false,
+  },
+  {
+    title: 'Allocate Into\nWarehouse',
+    icon: require('../assets/logomenu/AllocateIn.png'),
+    screen: 'AllocateInNO',
+    fcode: 'button_DBIn',
+    disabled: false,
+  },
+  {
+    title: 'Allocate Out',
+    icon: require('../assets/logomenu/Allocateout.png'),
+    screen: 'AllocateSAP',
+    fcode: 'button_DBOutSAP',
+    disabled: false,
+  },
+  {
+    title: 'Delivery',
+    icon: require('../assets/logomenu/Delivery.png'),
+    screen: 'DeliverySAP',
+    fcode: 'button_fahuoSAP',
+    disabled: false,
+  },
+  {
+    title: 'Allocate Return\nInto WH',
+    icon: require('../assets/logomenu/reject.png'),
+    screen: 'AllocateRejectIn',
+    fcode: 'btnAllocateRejectIn',
+    disabled: false,
+  },
+  {
+    title: 'Delivery\nReturn',
+    icon: require('../assets/logomenu/DeliveryReturn.png'),
+    screen: 'DeliveryReturnNo',
+    fcode: 'btnDeliveryReturn',
+    disabled: false,
+  },
+  {
+    title: 'Inventory\nVerification',
+    icon: require('../assets/logomenu/inventory1.png'),
+    screen: 'PD',
+    fcode: 'button_pd',
+    disabled: false,
+  },
+  {
+    title: 'Pallet\nSearch',
+    icon: require('../assets/logomenu/searchpallet.png'),
+    screen: 'PalletSearch',
+    fcode: 'button_pallerCx',
+    disabled: false,
+  },
+  {
+    title: 'Not In\nWare',
+    icon: require('../assets/logomenu/Notinware.png'),
+    screen: 'PalletNotIn',
+    fcode: 'btnNotIn',
+    disabled: false,
+  },
+  {
+    title: 'Box/Pallet\nAssembly',
+    icon: require('../assets/logomenu/Assembly.png'),
+    screen: 'Assembly',
+    fcode: 'button_boxZu',
+    disabled: false,
+  },
+  {
+    title: 'Box/Pallet\nDisassembly',
+    icon: require('../assets/logomenu/Disassembly.png'),
+    screen: 'Disassembly',
+    fcode: 'button_boxChai',
+    disabled: false,
+  },
+  {
+    title: 'SN\nReturn',
+    icon: require('../assets/logomenu/SNReturn.png'),
+    screen: 'SNReturn',
+    fcode: 'btnReturnSN',
+    disabled: true,
+  },
+  {
+    title: 'Distributor\nReturn',
+    icon: require('../assets/logomenu/DistributorReturn.png'),
+    screen: 'DistributorReturnNo',
+    fcode: 'btnDistributeReturn',
+    disabled: true,
+  },
+  // 2026-11-08 baya
+  {
+    title: 'Change\nPassword',
+    icon: require('../assets/logo/lock.png'),
+    screen: 'ChangePassword',
+    fcode: 'button_in',
+    disabled: false,
+  },
+
   /*{ title: "Allocate Out\nWarehouse", icon: "🚚", screen: "/", fcode: "button_DBOut" },
  { title: "Warehouse\nDelivery", icon: "📦", screen: "/", fcode: "button_fahuo" },
  */
 ];
 
 export default function Menu({ navigation }: any) {
-  const { gsURL, setgs_gsURL, gs_userName, gs_wareCode, gs_wareName, gs_factoryindex } = useGlobal();
+  const {
+    gsURL,
+    setgs_gsURL,
+    gs_userName,
+    gs_wareCode,
+    gs_wareName,
+    gs_factoryindex,
+  } = useGlobal();
   const BASE_URL = gsURL;
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState('');
 
   const { gs_roleCode } = useGlobal();
-  const { gs_wareType, operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion, } = useGlobal();
+  const {
+    gs_wareType,
+    operateUserCode,
+    operateUserName,
+    operateWareHouseCode,
+    operateRandomNumber,
+    operateSign,
+    operateVersion,
+  } = useGlobal();
   const [allowedMenus, setAllowedMenus] = useState<string[]>([]);
-
-
-
 
   useEffect(() => {
     const loadToken = async () => {
-      const t = await AsyncStorage.getItem("userToken");
-      console.log("TOKEN IN MENU:", t);
+      const t = await AsyncStorage.getItem('userToken');
+      console.log('TOKEN IN MENU:', t);
       if (t) setToken(t);
-      console.log("Operateinfo:", operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion);
+      console.log(
+        'Operateinfo:',
+        operateUserCode,
+        operateUserName,
+        operateWareHouseCode,
+        operateRandomNumber,
+        operateSign,
+        operateVersion,
+      );
     };
 
     loadToken();
@@ -62,49 +169,53 @@ export default function Menu({ navigation }: any) {
     if (!token) return;
 
     const loadMenuByRole = async () => {
-
       try {
         const res = await fetch(
           `${BASE_URL}/api/MenuListByRolePDA/pbc_MenuListByRolePDA`,
           {
-            method: "POST",
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-              operateUserCode, operateUserName, operateWareHouseCode, operateRandomNumber, operateSign, operateVersion,
+              operateUserCode,
+              operateUserName,
+              operateWareHouseCode,
+              operateRandomNumber,
+              operateSign,
+              operateVersion,
               roleCode: gs_roleCode,
             }),
-          }
+          },
         );
 
         if (res.status === 401) {
-          Alert.alert("Unauthorized", "Token expired or invalid.");
+          Alert.alert('Unauthorized', 'Token expired or invalid.');
           return;
         }
 
         if (res.status === 403) {
-          Alert.alert("Access Denied", "You do not have permission.");
+          Alert.alert('Access Denied', 'You do not have permission.');
           return;
         }
 
-        console.log("STATUS:", res.status);
+        console.log('STATUS:', res.status);
 
         if (!res.ok) {
           const errorText = await res.text();
-          console.log("ERROR:", errorText);
+          console.log('ERROR:', errorText);
 
           throw new Error(`HTTP ${res.status}`);
         }
 
         const data = await res.json();
         if (data.Code === 500) {
-          Alert.alert("Error", data.Message);
+          Alert.alert('Error', data.Message);
           return;
         }
 
-        console.log("MENU RESPONSE:", data);
+        console.log('MENU RESPONSE:', data);
 
         if (data.code === 200 && data.data) {
           const codes = data.data.map((m: any) => m.fcode);
@@ -112,32 +223,40 @@ export default function Menu({ navigation }: any) {
         }
       } catch (error) {
         console.log(error);
-        Alert.alert("Error", "Unable to load menu");
+        Alert.alert('Error', 'Unable to load menu');
       }
     };
 
     loadMenuByRole();
   }, [token]);
 
-
   const handleNavigation = (item: any) => {
     if (
-      item.screen === "WarehousingScanning" &&
-      gs_wareType !== "MainWarehouse"
-
+      item.screen === 'WarehousingScanning' &&
+      gs_wareType !== 'MainWarehouse'
     ) {
       Alert.alert(
-        "Restricted Access",
-        "Only the main warehouse can be put in storage!",
+        'Restricted Access',
+        'Only the main warehouse can be put in storage!',
         [
           {
-            text: "OK",
+            text: 'OK',
             onPress: () => {
               navigation.goBack();
             },
           },
-        ]
+        ],
       );
+      return;
+    }
+    // 2026-11-08 baya : the change password page needs the user
+    if (item.screen === 'ChangePassword') {
+      navigation.navigate('ChangePassword', {
+        userCode: operateUserCode,
+        userName: gs_userName,
+        reason: 'MENU',
+        forced: false,
+      });
       return;
     }
 
@@ -145,42 +264,37 @@ export default function Menu({ navigation }: any) {
       navigation.navigate(item.screen);
     } else {
       Alert.alert(
-        "Restricted Access",
-        "This module is currently undergoing maintenance."
+        'Restricted Access',
+        'This module is currently undergoing maintenance.',
       );
     }
   };
 
   const handleReturn = () => {
     navigation.goBack();
-
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      "Logout",
-      "Are you sure to logout?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
+    Alert.alert('Logout', 'Are you sure to logout?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Exit',
+        style: 'destructive',
+        onPress: () => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+          });
         },
-        {
-          text: "Exit",
-          style: "destructive",
-          onPress: () => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Login" }],
-            });
-          }
-        }
-      ]
-    );
+      },
+    ]);
   };
 
   const formatUserName = (name: string) => {
-    if (!name) return "";
+    if (!name) return '';
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) return parts[0];
     const firstName = parts[0];
@@ -193,16 +307,20 @@ export default function Menu({ navigation }: any) {
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
       <LinearGradient
-        colors={gs_factoryindex === "zentech" ? ['#06b86c', '#048a50'] : ['#f391f7ff', '#0052cc']}
+        colors={
+          gs_factoryindex === 'zentech'
+            ? ['#06b86c', '#048a50']
+            : ['#f391f7ff', '#0052cc']
+        }
         start={{ x: 1, y: 1 }}
-        end={{ x: 1, y: 0}}
+        end={{ x: 1, y: 0 }}
         style={styles.headerContainer}
       >
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <TouchableOpacity onPress={handleReturn} activeOpacity={0.7}>
               <Image
-                source={require("../assets/logo/left.png")}
+                source={require('../assets/logo/left.png')}
                 style={styles.returnLogo}
                 resizeMode="contain"
               />
@@ -214,15 +332,17 @@ export default function Menu({ navigation }: any) {
         <View style={styles.subHeader}>
           <View style={styles.subHeaderItem}>
             <Image
-              source={require("../assets/logo/user.png")}
+              source={require('../assets/logo/user.png')}
               style={styles.subHeaderIcon}
               resizeMode="contain"
             />
-            <Text style={styles.subHeaderText}>{formatUserName(gs_userName)}</Text>
+            <Text style={styles.subHeaderText}>
+              {formatUserName(gs_userName)}
+            </Text>
           </View>
           <View style={styles.subHeaderItem}>
             <Image
-              source={require("../assets/logo/warehouse.png")}
+              source={require('../assets/logo/warehouse.png')}
               style={styles.subHeaderIcon}
               resizeMode="contain"
             />
@@ -235,11 +355,11 @@ export default function Menu({ navigation }: any) {
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
-
-
         <View style={styles.grid}>
           {menuItems.map((item, index) => {
-            const isEnabled = (item.fcode ? allowedMenus.includes(item.fcode) : false) && !item.disabled;
+            const isEnabled =
+              (item.fcode ? allowedMenus.includes(item.fcode) : false) &&
+              !item.disabled;
             //const isEnabled = true;
             return (
               <TouchableOpacity
@@ -249,11 +369,19 @@ export default function Menu({ navigation }: any) {
                 disabled={!isEnabled}
                 onPress={() => item.screen && handleNavigation(item)}
               >
-                <View style={[styles.iconBox, !isEnabled && styles.disabledIconBox]}>
-                  <Image source={item.icon} style={styles.menuIcon} resizeMode="contain" />
+                <View
+                  style={[styles.iconBox, !isEnabled && styles.disabledIconBox]}
+                >
+                  <Image
+                    source={item.icon}
+                    style={styles.menuIcon}
+                    resizeMode="contain"
+                  />
                 </View>
 
-                <Text style={[styles.cardText, !isEnabled && styles.disabledText]}>
+                <Text
+                  style={[styles.cardText, !isEnabled && styles.disabledText]}
+                >
                   {item.title}
                 </Text>
 
@@ -262,22 +390,19 @@ export default function Menu({ navigation }: any) {
             );
           })}
         </View>
-
-
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-
-const { height } = Dimensions.get("window");
+const { height } = Dimensions.get('window');
 const isSmallDevice = width < 360;
 const scale = (size: number) => (width / 375) * size;
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: '#F8FAFC',
   },
 
   headerContainer: {
@@ -287,38 +412,38 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: width * 0.05,
     height: scale(56),
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   returnLogo: {
     width: scale(24),
     height: scale(24),
     marginRight: 10,
-    tintColor: "#FFFFFF",
+    tintColor: '#FFFFFF',
   },
 
   headerTitle: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: isSmallDevice ? scale(14) : scale(16),
-    fontWeight: "900",
+    fontWeight: '900',
   },
 
   headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   userNameText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: scale(12),
-    fontWeight: "700",
+    fontWeight: '700',
     marginRight: 1,
   },
 
@@ -336,14 +461,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
-
   },
   subHeaderIcon: {
     width: 16,
     height: 16,
     marginRight: 6,
     tintColor: '#FFFFFF',
-
   },
   subHeaderText: {
     color: '#FFFFFF',
@@ -355,17 +478,17 @@ const styles = StyleSheet.create({
     width: isSmallDevice ? 36 : 44,
     height: isSmallDevice ? 36 : 44,
     borderRadius: 22,
-    backgroundColor: "rgba(255,255,255,0.15)",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.25)",
+    borderColor: 'rgba(255,255,255,0.25)',
   },
 
   logoutIcon: {
-    width: "60%",
-    height: "60%",
-    tintColor: "#FFFFFF",
+    width: '60%',
+    height: '60%',
+    tintColor: '#FFFFFF',
   },
 
   scrollContainer: {
@@ -373,46 +496,45 @@ const styles = StyleSheet.create({
     paddingTop: height * 0.01,
     paddingBottom: height * 0.02,
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
 
   sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: height * 0.02,
   },
 
   sectionIndicator: {
     width: 4,
     height: 16,
-    backgroundColor: "#4F46E5",
+    backgroundColor: '#4F46E5',
     borderRadius: 2,
     marginRight: 8,
   },
 
   sectionTitle: {
     fontSize: isSmallDevice ? scale(10) : scale(12),
-    fontWeight: "800",
-    color: "#64748B",
-    textTransform: "uppercase",
+    fontWeight: '800',
+    color: '#64748B',
+    textTransform: 'uppercase',
   },
 
   grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
 
   card: {
-    width: width < 400 ? "48%" : "47%",
-    backgroundColor: "#FFFFFF",
+    width: width < 400 ? '48%' : '47%',
+    backgroundColor: '#FFFFFF',
     borderRadius: width * 0.06,
     paddingVertical: height * 0.02,
     marginBottom: height * 0.02,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     minHeight: scale(160),
-
   },
 
   disabledCard: {
@@ -423,9 +545,9 @@ const styles = StyleSheet.create({
     width: isSmallDevice ? 120 : 140,
     height: isSmallDevice ? 120 : 140,
     borderRadius: 24,
-    backgroundColor: "#F1F5F9",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
 
     elevation: 30,
@@ -441,54 +563,53 @@ const styles = StyleSheet.create({
   menuIcon: {
     width: isSmallDevice ? scale(90) : scale(120),
     height: isSmallDevice ? scale(90) : scale(120),
-
   },
 
   cardText: {
     fontSize: isSmallDevice ? scale(16) : scale(18),
-    fontWeight: "900",
-    textAlign: "center",
+    fontWeight: '900',
+    textAlign: 'center',
     lineHeight: isSmallDevice ? scale(18) : scale(22),
-    color: "#1E293B",
+    color: '#1E293B',
   },
 
   disabledText: {
-    color: "#94A3B8",
+    color: '#94A3B8',
   },
 
   activeDot: {
-    position: "absolute",
+    position: 'absolute',
     top: 10,
     right: 10,
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#4F46E5",
+    backgroundColor: '#4F46E5',
   },
 
   exitButton: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: '#FFFFFF',
     paddingVertical: height * 0.025,
     borderRadius: 20,
     marginTop: height * 0.03,
-    alignItems: "center",
+    alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: "#FEE2E2",
+    borderColor: '#FEE2E2',
   },
 
   exitText: {
-    color: "#EF4444",
+    color: '#EF4444',
     fontSize: isSmallDevice ? scale(11) : scale(13),
-    fontWeight: "900",
+    fontWeight: '900',
   },
 
   footerInfo: {
     marginTop: height * 0.04,
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   footerText: {
-    color: "#94A3B8",
+    color: '#94A3B8',
     fontSize: isSmallDevice ? scale(8) : scale(10),
   },
 });
